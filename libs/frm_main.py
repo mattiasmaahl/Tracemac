@@ -17,7 +17,8 @@ class frm_main(tk.Tk):
          app = mainwindow.App()\n
          app.mainloop()\n\n
     """
-
+    settings = configparser.ConfigParser()
+    
     def __init__(self):
         tk.Tk.__init__(self)
         self.my_frame = tk.Frame(master=self, width=300, height=200)
@@ -26,17 +27,17 @@ class frm_main(tk.Tk):
         self.createWidgets(self.my_frame)
         self.bind_all("<Control-q>", self.quit)
         settings_file = "../conf/settings.ini"
-        settings = configparser.ConfigParser()
+        
         #checks if the settings_file exists, if not it creates it with defaults.
         if os.path.isfile(settings_file):
-            settings.read(settings_file)
+            self.settings.read(settings_file)
         else:
             print("No settings file - reverting to standard and saving file to conf/settings.ini")
-            settings['DEFAULT'] = { 'community': 'public',
+            self.settings['DEFAULT'] = { 'community': 'public',
                                     'community_password': 'public' }
-            settings['userdata'] = {}
+            self.settings['userdata'] = {}
             with open(settings_file, 'w') as configfile:
-                settings.write(configfile)
+                self.settings.write(configfile)
 
     def quit(self, *event):
         self.destroy()
@@ -161,22 +162,40 @@ class frm_main(tk.Tk):
         settings_dialog = tk.Toplevel(self)
         settings_dialog.wm_title("Settings")
         settings_frame = tk.Frame(settings_dialog, width=200, height=300)
-        settings_frame.pack()
+        settings_frame.grid()
         q = lambda x, *y: settings_dialog.destroy()
-        
         settings_label=tk.Label(settings_frame, text="Settings:", font="Helvetica 24 underline bold")
         settings_label.config(anchor="w")
-        settings_label.grid(columnspan="2", row="0")
-        settings_btn_OK = tk.Button(settings_frame,
-                                    text="OK",
-                                    command=settings_dialog.destroy,
-                                    width="10")
-        settings_btn_OK.grid(column="0", row="1")
-        settings_btn_Cancel = tk.Button(settings_frame,
-                                        text="Cancel",
-                                        command=settings_dialog.destroy,
-                                        width="10")
-        settings_btn_Cancel.grid(column="1", row="1")
+        settings_label.grid(columnspan=3, row=0)
+        entry = {}
+        row=1
+        for section in self.settings.sections():
+            tk.Label(settings_dialog, text=(section + ":"))
+            row += 1
+            for key in self.settings[section]:
+                print(section, key, self.settings[section][key], row)
+                tk.Label(settings_dialog, text=key).grid(row=row, column=0, sticky="W")
+                en = tk.Entry(settings_dialog)
+                en.insert(0, self.settings[section][key])
+                en.grid(row=row, column=1)
+                data={key: en}
+                print(data)
+                entry[section]=data
+                #entry[key].insert(0, self.settings[section][key])
+                #print(self.settings[section][key])
+                tk.Label(settings_dialog, text=self.settings['DEFAULT'][key], font="Helvetica 10 italic").grid(row=row, column=2, sticky="W")
+                row += 1
+                
+        print (entry)
+                
+        tk.Button(settings_frame,
+                  text="OK",
+                  command=settings_dialog.destroy,
+                  width=10).grid(column=0, row=row)
+        tk.Button(settings_frame,
+                  text="Cancel",
+                  command=settings_dialog.destroy,
+                  width=10).grid(column=1, row=row)
         settings_dialog.mainloop()
 
 
