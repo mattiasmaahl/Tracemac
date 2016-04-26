@@ -159,10 +159,11 @@ class frm_main(tk.Tk):
         Display settingsdialog popupwindow.
         """
         settings_dialog = tk.Toplevel(self)
-        settings_dialog.wm_title("About Tracemac v2.0")
+        settings_dialog.wm_title("Settings")
         settings_frame = tk.Frame(settings_dialog, width=200, height=300)
         settings_frame.pack()
-
+        q = lambda x, *y: settings_dialog.destroy()
+        
         settings_label=tk.Label(settings_frame, text="Settings:", font="Helvetica 24 underline bold")
         settings_label.config(anchor="w")
         settings_label.grid(columnspan="2", row="0")
@@ -176,8 +177,6 @@ class frm_main(tk.Tk):
                                         command=settings_dialog.destroy,
                                         width="10")
         settings_btn_Cancel.grid(column="1", row="1")
-        settings_dialog.bind_all("<Enter>", settings_dialog.settings_frame.settings_btn_OK.click())
-        settings_dialog.bind_all("<Escape>", settings_dialog.settings_frame.settings_btn_Cancel.click())
         settings_dialog.mainloop()
 
 

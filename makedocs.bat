@@ -1,7 +1,5 @@
 @echo off
 cd docs
-echo cleaning up....
-call make clean
 echo making new Doc-site...
 call make html
 if "%1" == "--with-pdf" (
