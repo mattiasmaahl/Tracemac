@@ -1,0 +1,9 @@
+﻿Tracemac 2.0
+GUI-implementation of the terminal(linux) version 1.7.2
+Also this was made to be crossplatform and simpler to use
+
+Author Mattias Måhl
+
+License GPL v.2 or higher
+
+ 

@@ -1,0 +1,241 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Switch_Object module &mdash; Tracemac 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tracemac 2.0.0 documentation" href="index.html" />
+    <link rel="up" title="libs" href="modules.html" />
+    <link rel="next" title="Trace_Functions module" href="Trace_Functions.html" />
+    <link rel="prev" title="libs" href="modules.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Switch_Object">
+<span id="switch-object-module"></span><h1>Switch_Object module<a class="headerlink" href="#module-Switch_Object" title="Permalink to this headline">¶</a></h1>
+<p>Created 2013-08-27</p>
+<p>&#64;author Mattias Måhl</p>
+<p>Class Switch_Object</p>
+<p>This is an object to store Switchdata in.</p>
+<dl class="class">
+<dt id="Switch_Object.Sw_Object">
+<em class="property">class </em><code class="descclassname">Switch_Object.</code><code class="descname">Sw_Object</code><span class="sig-paren">(</span><em>*ipaddress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Initilization of the Switch Object setting up the switch and
+getting the information from the switch through SNMP.</p>
+<p>Defining the tuples and variables to store the switch data.</p>
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.append_mac_to_interface">
+<code class="descname">append_mac_to_interface</code><span class="sig-paren">(</span><em>interface</em>, <em>macaddress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.append_mac_to_interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.append_mac_to_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>function append_mac_to_interface</p>
+<p>a function to add mac-address to a specific interface. if interface not found add new interface and add the mac_address to it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.append_neighbor">
+<code class="descname">append_neighbor</code><span class="sig-paren">(</span><em>interface</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.append_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.append_neighbor" title="Permalink to this definition">¶</a></dt>
+<dd><p>function append_neighbor</p>
+<p>function to append Neighbor to the switchobjects array och neighbors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.check_if_alive">
+<code class="descname">check_if_alive</code><span class="sig-paren">(</span><em>ipaddress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.check_if_alive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.check_if_alive" title="Permalink to this definition">¶</a></dt>
+<dd><p>function check_if_alive</p>
+<p>function to ping host to see if it&#8217;s alive.</p>
+<p>raises error if it&#8217;s a fail.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.check_ip_address">
+<code class="descname">check_ip_address</code><span class="sig-paren">(</span><em>ipaddress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.check_ip_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.check_ip_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>function check_ip_address</p>
+<p>function to check if the ip-address provided is acceptable.</p>
+<p>i.e. number(dot)number(dot)number(dot)number</p>
+<p>return False if not and returns the same string if True</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="Switch_Object.Sw_Object.cl_switch_interface">
+<em class="property">class </em><code class="descname">cl_switch_interface</code><span class="sig-paren">(</span><em>interface</em>, <em>mac_address</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.cl_switch_interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.cl_switch_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>class cl_switch_interface</p>
+<p>Switch_objects interface object to store mac-adresses assosiated with the interface.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="Switch_Object.Sw_Object.cl_switch_neighbors">
+<em class="property">class </em><code class="descclassname">Sw_Object.</code><code class="descname">cl_switch_neighbors</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.cl_switch_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.cl_switch_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>class cl_switch_neighbores</p>
+<p>Switch_Objects neighbors object to store the switches neighbors and witch interface their on.</p>
+<dl class="attribute">
+<dt id="Switch_Object.Sw_Object.cl_switch_neighbors.interface">
+<code class="descname">interface</code><em class="property"> = 0</em><a class="headerlink" href="#Switch_Object.Sw_Object.cl_switch_neighbors.interface" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Switch_Object.Sw_Object.cl_switch_neighbors.ip_address">
+<code class="descname">ip_address</code><em class="property"> = ''</em><a class="headerlink" href="#Switch_Object.Sw_Object.cl_switch_neighbors.ip_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Switch_Object.Sw_Object.cl_switch_neighbors.name">
+<code class="descname">name</code><em class="property"> = ''</em><a class="headerlink" href="#Switch_Object.Sw_Object.cl_switch_neighbors.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Switch_Object.Sw_Object.cl_switch_neighbors.remote_interface">
+<code class="descname">remote_interface</code><em class="property"> = 0</em><a class="headerlink" href="#Switch_Object.Sw_Object.cl_switch_neighbors.remote_interface" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.find_my_mac_address">
+<code class="descclassname">Sw_Object.</code><code class="descname">find_my_mac_address</code><span class="sig-paren">(</span><em>mac_address</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.find_my_mac_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.find_my_mac_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>function to search the Mac-table of the switch to find a specific MAC-adress.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.find_switch_mac_address">
+<code class="descclassname">Sw_Object.</code><code class="descname">find_switch_mac_address</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.find_switch_mac_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.find_switch_mac_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>function find_switch_mac_address()</p>
+<p>Do snmp request för oid: 1.3.6.1.4.1.11.2.14.11.5.1.1.6.0 (BaseMacAddress)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.get_interface">
+<code class="descclassname">Sw_Object.</code><code class="descname">get_interface</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.get_interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.get_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>function get_interface</p>
+<p>searches registered interfaces and returns the interface_object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.get_mac_address_list">
+<code class="descclassname">Sw_Object.</code><code class="descname">get_mac_address_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.get_mac_address_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.get_mac_address_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>function get_mac_address_list</p>
+<p>Does a SNMP-request to gather the mac-address-table from this switch-object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.get_neighbor_at_interface">
+<code class="descclassname">Sw_Object.</code><code class="descname">get_neighbor_at_interface</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.get_neighbor_at_interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.get_neighbor_at_interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>function get_neighbor_at_interface</p>
+<p>function to get the neighbor at a specific interface.</p>
+<p>searches registered neighbors and returns a hit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.get_neighbors">
+<code class="descclassname">Sw_Object.</code><code class="descname">get_neighbors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.get_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.get_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>function get_neighbores</p>
+<p>gets the list of neighbors and stores them in the list &#8216;switch_neighbors&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.get_switch_data">
+<code class="descclassname">Sw_Object.</code><code class="descname">get_switch_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.get_switch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.get_switch_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do snmp-recuest to get the system name of the target switch.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Switch_Object.Sw_Object.is_interface_a_neighbor">
+<code class="descclassname">Sw_Object.</code><code class="descname">is_interface_a_neighbor</code><span class="sig-paren">(</span><em>interface</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#Sw_Object.is_interface_a_neighbor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.Sw_Object.is_interface_a_neighbor" title="Permalink to this definition">¶</a></dt>
+<dd><p>function is_interface_a_neighbor</p>
+<p>Check to see if the interface has neighbors registered.</p>
+<p>Returns True or False</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="Switch_Object.sw_error">
+<em class="property">exception </em><code class="descclassname">Switch_Object.</code><code class="descname">sw_error</code><span class="sig-paren">(</span><em>error_msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Switch_Object.html#sw_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Switch_Object.sw_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">libs</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">libs</a></li>
+      <li>Next: <a href="Trace_Functions.html" title="next chapter">Trace_Functions module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Switch_Object.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Mattias Måhl.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/Switch_Object.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tracemac module &mdash; Tracemac 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tracemac 2.0.0 documentation" href="index.html" />
+    <link rel="up" title="libs" href="modules.html" />
+    <link rel="prev" title="frm_main module" href="frm_main.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-tracemac">
+<span id="tracemac-module"></span><h1>tracemac module<a class="headerlink" href="#module-tracemac" title="Permalink to this headline">¶</a></h1>
+<p>** TraceMac
+** Traces a mac-address to a specific port in a switch.
+** Version: 1.7.2
+** License: GPLv2</p>
+<dl class="function">
+<dt id="tracemac.pr">
+<code class="descclassname">tracemac.</code><code class="descname">pr</code><span class="sig-paren">(</span><em>pr_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tracemac.html#pr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tracemac.pr" title="Permalink to this definition">¶</a></dt>
+<dd><p>function pr
+function to print out messages to stdout using a specified format.
+This is used for verbose output to stdout and logfile.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tracemac.printout">
+<code class="descclassname">tracemac.</code><code class="descname">printout</code><span class="sig-paren">(</span><em>msg</em>, <em>*w</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tracemac.html#printout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tracemac.printout" title="Permalink to this definition">¶</a></dt>
+<dd><p>function printout
+stardart output to stdout and logfile.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tracemac.read_infile">
+<code class="descclassname">tracemac.</code><code class="descname">read_infile</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tracemac.html#read_infile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tracemac.read_infile" title="Permalink to this definition">¶</a></dt>
+<dd><p>function read_infile
+this function serves to read the input file an store the targets for the search engine.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tracemac.split_string_into_chunks">
+<code class="descclassname">tracemac.</code><code class="descname">split_string_into_chunks</code><span class="sig-paren">(</span><em>text</em>, <em>length=94</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tracemac.html#split_string_into_chunks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tracemac.split_string_into_chunks" title="Permalink to this definition">¶</a></dt>
+<dd><p>function split_string_into_chunks
+this function serves to sprit output into chunks that&#8217;s under specified length.
+Default value is 94 chars.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tracemac.vreport">
+<code class="descclassname">tracemac.</code><code class="descname">vreport</code><span class="sig-paren">(</span><em>header</em>, <em>*msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tracemac.html#vreport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tracemac.vreport" title="Permalink to this definition">¶</a></dt>
+<dd><p>function vreport
+creates and outputs verbose output of progress.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tracemac.write_to_file">
+<code class="descclassname">tracemac.</code><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tracemac.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tracemac.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>function write_to_file
+if there is a file specified in options this will write to it.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">libs</a><ul>
+      <li>Previous: <a href="frm_main.html" title="previous chapter">frm_main module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tracemac.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Mattias Måhl.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/tracemac.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
