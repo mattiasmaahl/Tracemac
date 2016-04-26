@@ -2,7 +2,7 @@
 Created 2016-04-12
 @author: Mattias Måhl
 """
-
+from tkinter import *
 import tkinter as tk
 import codecs
 import configparser
@@ -161,41 +161,51 @@ class frm_main(tk.Tk):
         """
         settings_dialog = tk.Toplevel(self)
         settings_dialog.wm_title("Settings")
-        settings_frame = tk.Frame(settings_dialog, width=200, height=300)
-        settings_frame.grid()
-        q = lambda x, *y: settings_dialog.destroy()
-        settings_label=tk.Label(settings_frame, text="Settings:", font="Helvetica 24 underline bold")
-        settings_label.config(anchor="w")
-        settings_label.grid(columnspan=3, row=0)
+        settings_frame = tk.Frame(settings_dialog)
+        settings_frame.grid(sticky=(N, S, E, W), padx=(3, 12), pady=(3, 12))
+        settings_label=tk.Label(settings_frame, text="Settings:", font="Helvetica 20 underline bold")
+        #settings_label.config(anchor=(E,W,S,N))
+        settings_label.grid(columnspan=3, row=0, sticky=(E, W))
         entry = {}
+        tk.Label(settings_frame, text="Defaults", font="Helvetica 8 italic underline").grid(row=1, column=2, sticky=W)
+        
         row=1
         for section in self.settings.sections():
-            tk.Label(settings_dialog, text=(section + ":"))
+            txt = "Section: " + section
+            tk.Label(settings_frame, text=txt, font="Helvetica 11 bold underline").grid(column=0, row = row, sticky=(N,W), columnspan=2)
             row += 1
             for key in self.settings[section]:
-                print(section, key, self.settings[section][key], row)
-                tk.Label(settings_dialog, text=key).grid(row=row, column=0, sticky="W")
-                en = tk.Entry(settings_dialog)
+                #print(section, key, self.settings[section][key], row)
+                tk.Label(settings_frame, text=key).grid(row=row, column=0, sticky=W)
+                en = tk.Entry(settings_frame)
                 en.insert(0, self.settings[section][key])
-                en.grid(row=row, column=1)
+                en.grid(row=row, column=1, sticky=(E,W))
                 data={key: en}
-                print(data)
                 entry[section]=data
                 #entry[key].insert(0, self.settings[section][key])
                 #print(self.settings[section][key])
-                tk.Label(settings_dialog, text=self.settings['DEFAULT'][key], font="Helvetica 10 italic").grid(row=row, column=2, sticky="W")
+                tk.Label(settings_frame, text=self.settings['DEFAULT'][key], font="Helvetica 8 italic").grid(row=row, column=2, sticky="W")
                 row += 1
+                print(row)
                 
         print (entry)
-                
-        tk.Button(settings_frame,
-                  text="OK",
-                  command=settings_dialog.destroy,
-                  width=10).grid(column=0, row=row)
-        tk.Button(settings_frame,
-                  text="Cancel",
-                  command=settings_dialog.destroy,
-                  width=10).grid(column=1, row=row)
+        print (row)
+        btn_Ok = tk.Button(settings_frame,
+                           text="OK",
+                           command=settings_dialog.destroy,
+                           width=10)
+        btn_Ok.grid(column=1, row=(row+1), sticky=E)
+        btn_Cancel = tk.Button(settings_frame,
+                               text="Cancel",
+                               command=settings_dialog.destroy,
+                               width=10)
+        btn_Cancel.grid(column=2, row=(row+1), sticky=E)
+        settings_dialog.columnconfigure(0, weight=1)
+        settings_dialog.rowconfigure(0, weight=1)
+        settings_frame.columnconfigure(1, weight=1)
+        settings_dialog.update()
+        settings_dialog.minsize(settings_dialog.winfo_width(), settings_dialog.winfo_height())
+        print(settings_dialog.winfo_height(), settings_dialog.winfo_width())
         settings_dialog.mainloop()
 
 
