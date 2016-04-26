@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trace_Functions module &mdash; Tracemac 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Tracemac 2.0.0 documentation" href="index.html" />
+    <link rel="up" title="libs" href="modules.html" />
+    <link rel="next" title="frm_main module" href="frm_main.html" />
+    <link rel="prev" title="Switch_Object module" href="Switch_Object.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Trace_Functions">
+<span id="trace-functions-module"></span><h1>Trace_Functions module<a class="headerlink" href="#module-Trace_Functions" title="Permalink to this headline">¶</a></h1>
+<p>Created 2013-08-27</p>
+<p>&#64;author Mattias Måhl</p>
+<p>Class Tracefunctions</p>
+<p>Functions to administrate search for MAC-adress</p>
+<dl class="class">
+<dt id="Trace_Functions.Tracefunctions">
+<em class="property">class </em><code class="descclassname">Trace_Functions.</code><code class="descname">Tracefunctions</code><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="class">
+<dt id="Trace_Functions.Tracefunctions.Trace_arguments">
+<em class="property">class </em><code class="descname">Trace_arguments</code><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.Trace_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class Trace_arguments
+Object to store the supplied arguments.</p>
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_arguments.dump_file">
+<code class="descname">dump_file</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_arguments.dump_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_arguments.in_file">
+<code class="descname">in_file</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_arguments.in_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_arguments.start_ip_address">
+<code class="descname">start_ip_address</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_arguments.start_ip_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_arguments.target_ip_address">
+<code class="descname">target_ip_address</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_arguments.target_ip_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_arguments.target_mac_address">
+<code class="descname">target_mac_address</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_arguments.target_mac_address" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_arguments.verbose">
+<code class="descname">verbose</code><em class="property"> = False</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_arguments.verbose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Trace_Functions.Tracefunctions.Trace_result">
+<em class="property">class </em><code class="descclassname">Tracefunctions.</code><code class="descname">Trace_result</code><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.Trace_result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class Trace_result
+Object to store a single result from the search.
+This stores the path the program took to find the port witch has the mac-adress.</p>
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_result.SW_O">
+<code class="descname">SW_O</code><em class="property"> = []</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_result.SW_O" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_result.failed">
+<code class="descname">failed</code><em class="property"> = False</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_result.failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_result.search_ip">
+<code class="descname">search_ip</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_result.search_ip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_result.search_mac">
+<code class="descname">search_mac</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_result.search_mac" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="Trace_Functions.Tracefunctions.Trace_result.trace_end">
+<code class="descname">trace_end</code><em class="property"> = ''</em><a class="headerlink" href="#Trace_Functions.Tracefunctions.Trace_result.trace_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="Trace_Functions.Tracefunctions.chk_system_args">
+<code class="descclassname">Tracefunctions.</code><code class="descname">chk_system_args</code><span class="sig-paren">(</span><em>argv</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.chk_system_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.chk_system_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>function chk_system_args
+function to check if argumest supplied are correct and that mandatory argurments are supplied.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Trace_Functions.Tracefunctions.fix_macaddress">
+<code class="descclassname">Tracefunctions.</code><code class="descname">fix_macaddress</code><span class="sig-paren">(</span><em>MAC</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.fix_macaddress"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.fix_macaddress" title="Permalink to this definition">¶</a></dt>
+<dd><p>function fix_macaddres
+this function fixes the mac-address to be exactly the same even if the user supplies it in different formats.
+i.e 121212-121212 will become 121212121212 and likewise 12:12:12:12:12:12 will become 121212121212.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Trace_Functions.Tracefunctions.get_mac_address_from_ip">
+<code class="descclassname">Tracefunctions.</code><code class="descname">get_mac_address_from_ip</code><span class="sig-paren">(</span><em>ipaddress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.get_mac_address_from_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.get_mac_address_from_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>function get_mac_address_from_ip
+function to arping an ip address to get the Mac-address assosiated woth it.
+It&#8217;s important that the target ip address is on the same network as the machine running the program and NOT routed!
+If it&#8217;s routed the routers mac address will be the one reported by the arping!</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Trace_Functions.Tracefunctions.get_system_args">
+<code class="descclassname">Tracefunctions.</code><code class="descname">get_system_args</code><span class="sig-paren">(</span><em>argv</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.get_system_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.get_system_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>function get_system_args
+function to parse system arguments in cli-envioronment.
+Args:</p>
+<blockquote>
+<div><p>-h, &#8211;help=           Display helptext for cli-command.</p>
+<dl class="docutils">
+<dt>-i, &#8211;ipaddress=      Target ip-address to find in the network.</dt>
+<dd><em>note</em> this implies access to both mgmnt- and target network (if separate)</dd>
+</dl>
+<p>-s, &#8211;startingip=     IP-address of the first switch in the cascade.</p>
+<p>-o, &#8211;out=            Output logging top specified file.</p>
+<p>-m, &#8211;macaddress=     Target MAC-address to find in the network.</p>
+<p>-v, &#8211;verbose=        Enebles verbose output to standard output and logging file if &#8216;-o/-out= is used.</p>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f</span>, <span class="option">--in-file</span></kbd></td>
+<td>Enables function to loop through a list of targets in a text file.
+<em>note</em> One target per line.</td></tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="Trace_Functions.Tracefunctions.ping_my_address">
+<code class="descclassname">Tracefunctions.</code><code class="descname">ping_my_address</code><span class="sig-paren">(</span><em>ipaddress</em>, <em>cnt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.ping_my_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.ping_my_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>function ping_my_address
+simple function to ping the target IP-address to keep the Mac-address table up-to-date.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Trace_Functions.Tracefunctions.printhelp">
+<code class="descclassname">Tracefunctions.</code><code class="descname">printhelp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Trace_Functions.html#Tracefunctions.printhelp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Trace_Functions.Tracefunctions.printhelp" title="Permalink to this definition">¶</a></dt>
+<dd><p>function printhelp
+duh!</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">libs</a><ul>
+      <li>Previous: <a href="Switch_Object.html" title="previous chapter">Switch_Object module</a></li>
+      <li>Next: <a href="frm_main.html" title="next chapter">frm_main module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Trace_Functions.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Mattias Måhl.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+      |
+      <a href="_sources/Trace_Functions.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

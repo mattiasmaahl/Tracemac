@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Trace_Functions &mdash; Tracemac 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Tracemac 2.0.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Trace_Functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created 2013-08-27\n</span>
+<span class="sd">@author Mattias Måhl\n</span>
+<span class="sd">Class Tracefunctions\n</span>
+<span class="sd">Functions to administrate search for MAC-adress\n</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">getopt</span>  
+
+<div class="viewcode-block" id="Tracefunctions"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions">[docs]</a><span class="k">class</span> <span class="nc">Tracefunctions</span><span class="p">:</span>
+<div class="viewcode-block" id="Tracefunctions.get_system_args"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.get_system_args">[docs]</a>    <span class="k">def</span> <span class="nf">get_system_args</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function get_system_args</span>
+<span class="sd">        function to parse system arguments in cli-envioronment.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            -h, --help=           Display helptext for cli-command.</span>
+
+<span class="sd">            -i, --ipaddress=      Target ip-address to find in the network.</span>
+<span class="sd">                                  *note* this implies access to both mgmnt- and target network (if separate)</span>
+
+<span class="sd">            -s, --startingip=     IP-address of the first switch in the cascade.</span>
+
+<span class="sd">            -o, --out=            Output logging top specified file.</span>
+
+<span class="sd">            -m, --macaddress=     Target MAC-address to find in the network.</span>
+
+<span class="sd">            -v, --verbose=        Enebles verbose output to standard output and logging file if &#39;-o/-out= is used.</span>
+
+<span class="sd">            -f, --in-file         Enables function to loop through a list of targets in a text file.</span>
+<span class="sd">                                  *note* One target per line.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">dump_trace_to_file</span>
+        
+        <span class="n">targs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Trace_arguments</span><span class="p">()</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">printhelp</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">opts</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">getopt</span><span class="o">.</span><span class="n">getopt</span><span class="p">(</span>
+                <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="s2">&quot;hi:s:o:m:vf:&quot;</span><span class="p">,</span>
+                <span class="p">[</span><span class="s2">&quot;ipaddress=&quot;</span><span class="p">,</span> <span class="s2">&quot;help&quot;</span><span class="p">,</span> <span class="s2">&quot;startingip=&quot;</span><span class="p">,</span> <span class="s2">&quot;out=&quot;</span><span class="p">,</span> <span class="s2">&quot;macaddress=&quot;</span><span class="p">,</span> <span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="s2">&quot;in-file=&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">getopt</span><span class="o">.</span><span class="n">GetoptError</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Options error: check your supplied options!&quot;</span><span class="p">)</span>
+            <span class="n">printhelp</span><span class="p">()</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span> <span class="s2">&quot;--help&quot;</span><span class="p">):</span>
+                <span class="n">printhelp</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-i&quot;</span><span class="p">,</span> <span class="s2">&quot;--ipaddress&quot;</span><span class="p">):</span>
+                <span class="n">targs</span><span class="o">.</span><span class="n">target_ip_address</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--startingip&quot;</span><span class="p">):</span>
+                <span class="n">targs</span><span class="o">.</span><span class="n">start_ip_address</span> <span class="o">=</span> <span class="n">arg</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;--out&quot;</span><span class="p">):</span>
+                <span class="n">targs</span><span class="o">.</span><span class="n">dump_file</span> <span class="o">=</span> <span class="n">arg</span>
+                <span class="n">dump_trace_to_file</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-m&quot;</span><span class="p">,</span> <span class="s2">&quot;--macaddress&quot;</span><span class="p">):</span>
+                <span class="n">targs</span><span class="o">.</span><span class="n">target_mac_address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fix_macaddress</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;--verbose&quot;</span><span class="p">):</span>
+                <span class="n">targs</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">opt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;-f&quot;</span><span class="p">,</span> <span class="s2">&quot;--in-file&quot;</span><span class="p">):</span>
+                <span class="n">targs</span><span class="o">.</span><span class="n">in_file</span> <span class="o">=</span> <span class="n">arg</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">chk_system_args</span><span class="p">(</span><span class="n">targs</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">targs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="Tracefunctions.chk_system_args"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.chk_system_args">[docs]</a>    <span class="k">def</span> <span class="nf">chk_system_args</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function chk_system_args</span>
+<span class="sd">        function to check if argumest supplied are correct and that mandatory argurments are supplied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">argv</span><span class="o">.</span><span class="n">start_ip_address</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Syntax error Required option --startingip(-s) not specified</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">printhelp</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">argv</span><span class="o">.</span><span class="n">target_mac_address</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">argv</span><span class="o">.</span><span class="n">target_ip_address</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">argv</span><span class="o">.</span><span class="n">in_file</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Syntax error: -i or -m not set</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">printhelp</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">argv</span><span class="o">.</span><span class="n">target_mac_address</span> <span class="ow">and</span> <span class="n">argv</span><span class="o">.</span><span class="n">target_ip_address</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Syntax error: -i and -m set can only use one or the other.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">printhelp</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span></div>
+
+<div class="viewcode-block" id="Tracefunctions.fix_macaddress"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.fix_macaddress">[docs]</a>    <span class="k">def</span> <span class="nf">fix_macaddress</span><span class="p">(</span><span class="n">MAC</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function fix_macaddres</span>
+<span class="sd">        this function fixes the mac-address to be exactly the same even if the user supplies it in different formats.</span>
+<span class="sd">        i.e 121212-121212 will become 121212121212 and likewise 12:12:12:12:12:12 will become 121212121212.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">MAC</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+        
+    <span class="c1">## Print the help text:</span>
+<div class="viewcode-block" id="Tracefunctions.printhelp"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.printhelp">[docs]</a>    <span class="k">def</span> <span class="nf">printhelp</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function printhelp</span>
+<span class="sd">        duh!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span> <span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        Tracemac 1.7.1 Usage:</span>
+<span class="s2">        ---------------------------------------------------------------------------------------------------------------</span>
+<span class="s2">        ./tracemac.py [-h] -s {IP-ADDRESS} [{-m [MAC-ADDRES]} OR {-i [IP-ADDRESS]} [-o {PATH/TO/OUTPUT.FILE]} </span>
+<span class="s2">        </span>
+<span class="s2">        OPTIONS:</span>
+<span class="s2">            -h, --help	    Displays this help.</span>
+
+<span class="s2">        REQUIRED OPTION:    </span>
+<span class="s2">            -s, --starting-ip   defines witch ip-address to start the search</span>
+<span class="s2">                                This is Required!</span>
+<span class="s2">                                example: ./tracemac.py -i 192.168.1.1</span>
+<span class="s2">                                    </span>
+<span class="s2">        ONE OF THE FOLLOWING HAS TO BE SET:</span>
+<span class="s2">            -m, --macaddress    Whitch Mac-Address to trace.</span>
+<span class="s2">                                Accepted strings:</span>
+<span class="s2">                                    0000aa-9973ab</span>
+<span class="s2">                                    00:00:aa:99:73:ab</span>
+<span class="s2">                                note: this option requires an up-to-date arp-table</span>
+<span class="s2">                                </span>
+<span class="s2">            -i, --ipaddress     Whitch Ip-address to trace.</span>
+
+<span class="s2">        OPTIONAL ARGS:</span>
+<span class="s2">            -o, --out           Dump the trace to a file.</span>
+<span class="s2">            -v, --verbose       Print all information</span>
+<span class="s2">            -f, --in-file       Specify a file witch contains a list of IP-addresses</span>
+<span class="s2">                                This option cannot be used with -m or -i</span>
+
+<span class="s2">    ---------------------------------------------------------------------------------------------------------------</span>
+<span class="s2">     Auther: Mattias Måhl 2012</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tracefunctions.get_mac_address_from_ip"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.get_mac_address_from_ip">[docs]</a>    <span class="k">def</span> <span class="nf">get_mac_address_from_ip</span><span class="p">(</span><span class="n">ipaddress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function get_mac_address_from_ip</span>
+<span class="sd">        function to arping an ip address to get the Mac-address assosiated woth it.</span>
+<span class="sd">        It&#39;s important that the target ip address is on the same network as the machine running the program and NOT routed!</span>
+<span class="sd">        If it&#39;s routed the routers mac address will be the one reported by the arping!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ip_alive</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s1">&#39;ping -c 1 &#39;</span> <span class="o">+</span> <span class="n">ipaddress</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;1 received&quot;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="n">ip_alive</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ip_alive</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s1">&#39;ping -c 1 &#39;</span> <span class="o">+</span> <span class="n">ipaddress</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s2">&quot;1 received&quot;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+                        <span class="n">ip_alive</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ip_alive</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+
+        <span class="n">p</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s1">&#39;arp -a &#39;</span> <span class="o">+</span> <span class="n">ipaddress</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">ipaddress</span> <span class="ow">in</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">in</span> <span class="n">j</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">j</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">False</span></div>
+
+<div class="viewcode-block" id="Tracefunctions.ping_my_address"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.ping_my_address">[docs]</a>    <span class="k">def</span> <span class="nf">ping_my_address</span><span class="p">(</span><span class="n">ipaddress</span><span class="p">,</span> <span class="n">cnt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function ping_my_address</span>
+<span class="sd">        simple function to ping the target IP-address to keep the Mac-address table up-to-date.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="s1">&#39;ping -c </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cnt</span><span class="p">,</span> <span class="n">ipaddress</span><span class="p">),</span> <span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Tracefunctions.Trace_arguments"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.Trace_arguments">[docs]</a>    <span class="k">class</span> <span class="nc">Trace_arguments</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class Trace_arguments</span>
+<span class="sd">        Object to store the supplied arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_ip_address</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">target_mac_address</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">dump_file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">target_ip_address</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">in_file</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="Tracefunctions.Trace_result"><a class="viewcode-back" href="../Trace_Functions.html#Trace_Functions.Tracefunctions.Trace_result">[docs]</a>    <span class="k">class</span> <span class="nc">Trace_result</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class Trace_result</span>
+<span class="sd">        Object to store a single result from the search.</span>
+<span class="sd">        This stores the path the program took to find the port witch has the mac-adress.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">SW_O</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">trace_end</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">search_ip</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">search_mac</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">failed</span> <span class="o">=</span> <span class="bp">False</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Mattias Måhl.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

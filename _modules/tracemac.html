@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tracemac &mdash; Tracemac 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Tracemac 2.0.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tracemac</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">** TraceMac</span>
+<span class="sd">** Traces a mac-address to a specific port in a switch.</span>
+<span class="sd">** Version: 1.7.2</span>
+<span class="sd">** License: GPLv2</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">_VERSION_</span> <span class="o">=</span> <span class="s2">&quot;1.7.2&quot;</span>
+
+<span class="c1">#!/usr/bin/python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">pysnmp.egg&quot;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">))</span>
+
+<span class="c1"># Imports:</span>
+<span class="kn">from</span> <span class="nn">pysnmp.entity.rfc3413.oneliner</span> <span class="kn">import</span> <span class="n">cmdgen</span>
+<span class="kn">import</span> <span class="nn">getopt</span>
+<span class="kn">from</span> <span class="nn">Switch_Object</span> <span class="kn">import</span> <span class="n">Sw_Object</span>  <span class="c1">#Class to be imported later!</span>
+<span class="kn">from</span> <span class="nn">Trace_Functions</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1">#main variables:</span>
+<span class="n">SWO</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>                 <span class="c1">#list-object to store switches</span>
+<span class="n">Trace_args</span> <span class="o">=</span> <span class="n">Tracefunctions</span><span class="o">.</span><span class="n">Trace_arguments</span><span class="p">()</span>
+<span class="n">dump_trace_to_file</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">list_of_targets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">multi_trace_file_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">multiple_result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+
+
+<span class="c1">##Trace_args.start_ip_address =  &quot;192.168.1.253&quot;      #target</span>
+<span class="c1">###Trace_args.target_mac_address = &quot;00089bac92fa&quot;)    #macaddress</span>
+<span class="c1">##Trace_args.dump_file = &quot;dumpfile.route&quot;             #out</span>
+<span class="c1">##Trace_args.target_ip_address = &quot;192.168.1.99&quot;       #ipaddress</span>
+
+
+<div class="viewcode-block" id="pr"><a class="viewcode-back" href="../tracemac.html#tracemac.pr">[docs]</a><span class="k">def</span> <span class="nf">pr</span><span class="p">(</span><span class="n">pr_str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    function pr</span>
+<span class="sd">    function to print out messages to stdout using a specified format.</span>
+<span class="sd">    This is used for verbose output to stdout and logfile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">pr_str</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="s2">&quot;*&quot;</span><span class="p">))</span>
+    <span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pr_str</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="s2">&quot;*&quot;</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="vreport"><a class="viewcode-back" href="../tracemac.html#tracemac.vreport">[docs]</a><span class="k">def</span> <span class="nf">vreport</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="o">*</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    function vreport</span>
+<span class="sd">    creates and outputs verbose output of progress.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">95</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+        <span class="k">print</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+        <span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">((</span><span class="n">tmp</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="s2">&quot;big&quot;</span><span class="p">):</span>
+        <span class="n">mystr</span> <span class="o">=</span> <span class="n">split_string_into_chunks</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">txt</span> <span class="ow">in</span> <span class="n">mystr</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="n">txt</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+            <span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">((</span><span class="n">txt</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)))</span>    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot; </span><span class="si">%s</span><span class="s2"> -&gt; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">),</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="k">print</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+        <span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">((</span><span class="n">tmp</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="printout"><a class="viewcode-back" href="../tracemac.html#tracemac.printout">[docs]</a><span class="k">def</span> <span class="nf">printout</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">w</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    function printout</span>
+<span class="sd">    stardart output to stdout and logfile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">w</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">msg</span><span class="p">,)</span>
+        <span class="n">write_to_file</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">write_to_file</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">msg</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="write_to_file"><a class="viewcode-back" href="../tracemac.html#tracemac.write_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_to_file</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    function write_to_file</span>
+<span class="sd">    if there is a file specified in options this will write to it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dump_trace_to_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">dump_file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myfile</span><span class="p">:</span>
+            <span class="n">myfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="split_string_into_chunks"><a class="viewcode-back" href="../tracemac.html#tracemac.split_string_into_chunks">[docs]</a><span class="k">def</span> <span class="nf">split_string_into_chunks</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">94</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    function split_string_into_chunks</span>
+<span class="sd">    this function serves to sprit output into chunks that&#39;s under specified length.</span>
+<span class="sd">    Default value is 94 chars.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="n">retstr</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tmp2</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">length</span><span class="p">):</span>
+            <span class="n">tmp2</span> <span class="o">=</span> <span class="n">tmp2</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp2</span><span class="p">)</span>
+            <span class="n">tmp2</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span> <span class="n">retstr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">retstr</span></div>
+
+<div class="viewcode-block" id="read_infile"><a class="viewcode-back" href="../tracemac.html#tracemac.read_infile">[docs]</a><span class="k">def</span> <span class="nf">read_infile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    function read_infile</span>
+<span class="sd">    this function serves to read the input file an store the targets for the search engine.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rettup</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">myfile</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">(</span><span class="n">myfile</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">:</span> <span class="n">rettup</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">myfile</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span> <span class="n">myfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rettup</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rettup</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<span class="k">def</span> <span class="nf">_do_search</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    private function _do_search</span>
+<span class="sd">    this is where the magic happens.</span>
+<span class="sd">    starts a search based on the users options.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">TR</span> <span class="o">=</span> <span class="n">Trace_result</span><span class="p">()</span>
+    
+    <span class="k">if</span> <span class="n">arg1</span> <span class="o">==</span> <span class="s2">&quot;single&quot;</span><span class="p">:</span>
+        <span class="n">S_IP</span> <span class="o">=</span> <span class="n">Trace_args</span><span class="o">.</span><span class="n">target_ip_address</span>
+        <span class="n">S_MAC</span> <span class="o">=</span> <span class="n">Trace_args</span><span class="o">.</span><span class="n">target_mac_address</span>
+    <span class="k">elif</span> <span class="n">arg1</span> <span class="o">==</span> <span class="s2">&quot;multiple&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">S_IP</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;ipaddress&quot;</span><span class="p">]</span>
+            <span class="n">S_MAC</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;mac&quot;</span><span class="p">]</span>
+    <span class="n">SWO</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">SWO</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Sw_Object</span><span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">start_ip_address</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;IP-Address:&quot;</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">)</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;System-Name:&quot;</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">system_name</span><span class="p">)</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Mac-Address:&quot;</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_mac_address</span><span class="p">)</span>
+
+    <span class="n">pingme</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">S_MAC</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span> <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Arguments:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span> <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;IP-Address:&quot;</span><span class="p">,</span> <span class="n">S_IP</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;Ip-address supplied. Arp-pinging to get the mac-address...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span> <span class="ow">and</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;Searching for: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">S_IP</span><span class="p">),</span> <span class="s2">&quot;W&quot;</span><span class="p">)</span>
+        <span class="n">S_MAC</span> <span class="o">=</span> <span class="n">get_mac_address_from_ip</span><span class="p">(</span><span class="n">S_IP</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">S_MAC</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_do_multiple_search</span><span class="p">:</span>
+                <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;Ping failed to host.&quot;</span><span class="p">)</span>
+                <span class="n">T</span> <span class="o">=</span> <span class="n">Trace_result</span><span class="p">()</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">SW_O</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">search_ip</span> <span class="o">=</span> <span class="n">S_IP</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">failed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">T</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Ping failed to host&quot;</span>
+                <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="n">T</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot; OOOPS!! &quot;</span> <span class="p">)</span>
+                <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot; No Answer from ping. Target appears to be offline&quot;</span> <span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pingme</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;  Got MAC from ARP:&quot;</span><span class="p">,</span> <span class="n">S_MAC</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;Got MAC: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">S_MAC</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">printout</span><span class="p">(</span><span class="s2">&quot; [</span><span class="si">%s</span><span class="s2">] &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">S_MAC</span><span class="p">),</span> <span class="s2">&quot;W&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span> <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span> <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;  STARTING TRACE  &quot;</span><span class="p">)</span>
+    
+    <span class="n">mac_address_is_at_endpoint</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">mac_address_is_at_endpoint</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pingme</span><span class="p">:</span> <span class="n">ping_my_address</span><span class="p">(</span><span class="n">S_IP</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)</span>
+        
+        <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find_my_mac_address</span><span class="p">(</span><span class="n">S_MAC</span><span class="p">)</span>
+        <span class="c1">#print &quot;interface %s &quot; % (SWO[-1].mac_found_at_interface)</span>
+        
+        <span class="n">is_neighbor</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_interface_a_neighbor</span><span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+        <span class="n">interface</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_interface</span><span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+        <span class="n">has_multiple_mac</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">interface</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">pingme</span><span class="p">:</span> <span class="n">ping_my_address</span><span class="p">(</span><span class="n">S_IP</span><span class="p">)</span>
+            <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">find_my_mac_address</span><span class="p">(</span><span class="n">S_MAC</span><span class="p">)</span>
+            <span class="c1">#print &quot;interface %s &quot; % (SWO[-1].mac_found_at_interface)</span>
+            <span class="n">is_neighbor</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_interface_a_neighbor</span><span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+            <span class="n">interface</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_interface</span><span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+            <span class="n">has_multiple_mac</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">interface</span><span class="p">):</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">search_ip</span> <span class="o">=</span> <span class="n">S_IP</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">SW_O</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">trace_end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> / </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">failed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Mac-addres not found at switch last switch.&quot;</span>
+                <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="n">TR</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">interface</span><span class="o">.</span><span class="n">interface</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">TR</span><span class="o">.</span><span class="n">search_ip</span> <span class="o">=</span> <span class="n">S_IP</span>
+            <span class="n">TR</span><span class="o">.</span><span class="n">SW_O</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">TR</span><span class="o">.</span><span class="n">trace_end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> / </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+            <span class="n">TR</span><span class="o">.</span><span class="n">failed</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">TR</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;IP/Mac is a switch&quot;</span>
+            <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="n">TR</span>
+            
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">interface</span><span class="o">.</span><span class="n">mac_address</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">has_multiple_mac</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span>
+                <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Ip-Address:&quot;</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">)</span>
+                <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Interface:&quot;</span><span class="p">,</span> <span class="n">retval</span><span class="p">)</span>
+                <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Interface has neighbor:&quot;</span><span class="p">,</span> <span class="n">is_neighbor</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">):</span>
+                <span class="n">st</span> <span class="o">=</span> <span class="s2">&quot;Mac Found: </span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+                <span class="n">printout</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_neighbor</span><span class="p">:</span>
+                <span class="n">neighbor</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">get_neighbor_at_interface</span><span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span>
+                    <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;   with IP_address:&quot;</span><span class="p">,</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">ip_address</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">):</span>
+                    <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot; -&gt; going to neighbor : </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">neighbor</span><span class="o">.</span><span class="n">ip_address</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Interface has multiple Mac:&quot;</span><span class="p">,</span> <span class="n">has_multiple_mac</span><span class="p">)</span>
+           
+            <span class="k">if</span> <span class="p">(</span><span class="n">is_neighbor</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">pr</span><span class="p">(</span><span class="s2">&quot; Going to next switch... &quot;</span><span class="p">)</span>
+                <span class="n">SWO</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Sw_Object</span><span class="p">(</span><span class="n">neighbor</span><span class="o">.</span><span class="n">ip_address</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;IP-Address:&quot;</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;System-Name:&quot;</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">system_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Mac-Address:&quot;</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_mac_address</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">is_neighbor</span> <span class="ow">and</span> <span class="n">has_multiple_mac</span><span class="p">):</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">SW_O</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">trace_end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> / </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">failed</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Interface has multiple mac!&quot;</span>
+                <span class="k">return</span> <span class="bp">True</span><span class="p">,</span> <span class="n">TR</span>
+            <span class="k">elif</span> <span class="p">(</span> <span class="ow">not</span> <span class="n">is_neighbor</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_multiple_mac</span><span class="p">):</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">SW_O</span> <span class="o">=</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">trace_end</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> / </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">switch_ip_address</span><span class="p">,</span> <span class="n">SWO</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">search_ip</span> <span class="o">=</span> <span class="n">S_IP</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">search_mac</span> <span class="o">=</span> <span class="n">S_MAC</span>
+                <span class="n">TR</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Success&quot;</span>
+                <span class="k">if</span> <span class="n">_do_multiple_search</span><span class="p">:</span> <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;-&gt; Success!&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">False</span><span class="p">,</span> <span class="n">TR</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1">## PROGRAM STARTS HERE:</span>
+    <span class="sd">&#39;&#39;&#39; TODO: Uncomment later: &#39;&#39;&#39;</span>
+    <span class="n">Trace_args</span> <span class="o">=</span> <span class="n">get_system_args</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">dump_file</span><span class="p">):</span>
+        <span class="n">dump_trace_to_file</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">fi</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">dump_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="n">fi</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Trace_args</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="n">_do_multiple_search</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">in_file</span><span class="p">):</span>
+        <span class="n">multi_trace_file_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.trace&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">in_file</span><span class="p">)</span>
+        <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;Reading file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">in_file</span><span class="p">))</span>
+        
+        <span class="n">list_of_targets</span> <span class="o">=</span> <span class="n">read_infile</span><span class="p">(</span><span class="n">Trace_args</span><span class="o">.</span><span class="n">in_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">list_of_targets</span><span class="p">:</span>
+            <span class="n">_do_multiple_search</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%s</span><span class="s2"> targets in this file.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_of_targets</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;error: no targets found&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+    <span class="c1">#this is to make things easier.</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">Trace_args</span><span class="o">.</span><span class="n">verbose</span>
+
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+        <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;  TRACEMAC v</span><span class="si">%s</span><span class="s2">   &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_VERSION_</span><span class="p">))</span>
+        <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;TRACEMAC v</span><span class="si">%s</span><span class="s2">   &quot;</span>  <span class="o">%</span> <span class="p">(</span><span class="n">_VERSION_</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;Starting trace  &quot;</span> <span class="p">)</span>
+        <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_do_multiple_search</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">list_of_targets</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;pinging </span><span class="si">%s</span><span class="s2"> 4 times&quot;</span> <span class="o">%</span> <span class="n">target</span><span class="p">)</span>
+            <span class="n">ping_my_address</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;4&quot;</span><span class="p">)</span>
+            <span class="n">Search_table</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ipaddress&quot;</span><span class="p">:</span> <span class="n">target</span><span class="p">,</span> <span class="s2">&quot;mac&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
+            <span class="n">error</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">_do_search</span><span class="p">(</span><span class="s2">&quot;multiple&quot;</span><span class="p">,</span> <span class="n">Search_table</span><span class="p">)</span>
+            <span class="n">multiple_result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+            
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">error</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">_do_search</span><span class="p">(</span><span class="s2">&quot;single&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+        <span class="n">pr</span><span class="p">(</span><span class="s2">&quot; Ooops! &quot;</span><span class="p">)</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;This Interface seems to have multiple MAC:s but no Neighbors!! this can happen when there is a non-manageble switch on the interface. Or old Firmwares. Check your dokumentation.&quot;</span><span class="p">,</span> <span class="s2">&quot;big&quot;</span><span class="p">)</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">pr</span><span class="p">(</span><span class="s2">&quot; Trace ended at: &quot;</span><span class="p">)</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Switch named:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">SW_O</span><span class="o">.</span><span class="n">system_name</span><span class="p">)</span>
+        <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;IP-Address / port:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">trace_end</span><span class="p">)</span>
+        <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_do_multiple_search</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+                <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;End of search. Result: Success!&quot;</span><span class="p">)</span>
+                <span class="n">printout</span><span class="p">(</span> <span class="s2">&quot;&quot;</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">:</span> <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">pr</span><span class="p">(</span><span class="s2">&quot; Success! &quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">search_ip</span><span class="p">):</span>
+                <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Requested IP-Address:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">search_ip</span><span class="p">)</span>
+                <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;With MAC:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">search_mac</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Requested MAC:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">search_mac</span><span class="p">)</span>
+
+            <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Seems to be on switch named:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">SW_O</span><span class="o">.</span><span class="n">system_name</span><span class="p">)</span>
+            <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;IP-Address / port:&quot;</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">trace_end</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">_do_multiple_search</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">multi_trace_file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;  Done  &quot;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot; Searchresults from </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">multi_trace_file_name</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;.trace&quot;</span><span class="p">)))</span>
+            <span class="n">vreport</span><span class="p">(</span><span class="s2">&quot;Search results:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">multiple_result</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span><span class="o">.</span><span class="n">failed</span><span class="p">:</span>
+                    <span class="n">mystr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> [</span><span class="si">%s</span><span class="s2">] &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">search_ip</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">search_mac</span><span class="p">)</span>
+                    <span class="n">mystr2</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">SW_O</span><span class="o">.</span><span class="n">system_name</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">trace_end</span><span class="p">)</span>
+                    <span class="n">fstr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\t</span><span class="si">%s</span><span class="se">\t</span><span class="si">%s</span><span class="se">\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">search_ip</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">search_mac</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">SW_O</span><span class="o">.</span><span class="n">switch_ip_address</span> <span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">SW_O</span><span class="o">.</span><span class="n">mac_found_at_interface</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fstr</span><span class="p">))</span>
+                    <span class="n">vreport</span><span class="p">(</span><span class="n">mystr</span><span class="p">,</span> <span class="n">mystr2</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">fstr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="se">\t\t\t\t\t</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">search_ip</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fstr</span><span class="p">))</span>
+                    <span class="n">vreport</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">search_ip</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">pr</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_do_multiple_search</span><span class="p">:</span>
+        <span class="n">printout</span><span class="p">(</span><span class="s2">&quot;Se full report in file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">multi_trace_file_name</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Mattias Måhl.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>frm_main &mdash; Tracemac 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Tracemac 2.0.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for frm_main</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created 2016-04-12</span>
+<span class="sd">@author: Mattias Måhl</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">tkinter</span> <span class="kn">as</span> <span class="nn">tk</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+
+<div class="viewcode-block" id="frm_main"><a class="viewcode-back" href="../frm_main.html#frm_main.frm_main">[docs]</a><span class="k">class</span> <span class="nc">frm_main</span><span class="p">(</span><span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Start object to render the application window.\n</span>
+<span class="sd">    use:\n</span>
+<span class="sd">    import libs.frm_main as mainwindow\n</span>
+<span class="sd">    if __name__ == &quot;__main__&quot;:\n</span>
+<span class="sd">         app = mainwindow.App()\n</span>
+<span class="sd">         app.mainloop()\n\n</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tk</span><span class="o">.</span><span class="n">Tk</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_frame</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">master</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Menu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_frame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">createWidgets</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_frame</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind_all</span><span class="p">(</span><span class="s2">&quot;&lt;Control-q&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quit</span><span class="p">)</span>
+        <span class="n">settings_file</span> <span class="o">=</span> <span class="s2">&quot;../conf/settings.ini&quot;</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="c1">#checks if the settings_file exists, if not it creates it with defaults.</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">settings_file</span><span class="p">):</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">settings_file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;No settings file - reverting to standard and saving file to conf/settings.ini&quot;</span><span class="p">)</span>
+            <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;DEFAULT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;community&#39;</span><span class="p">:</span> <span class="s1">&#39;public&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;community_password&#39;</span><span class="p">:</span> <span class="s1">&#39;public&#39;</span> <span class="p">}</span>
+            <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;userdata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">settings_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">configfile</span><span class="p">:</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">configfile</span><span class="p">)</span>
+
+<div class="viewcode-block" id="frm_main.quit"><a class="viewcode-back" href="../frm_main.html#frm_main.frm_main.quit">[docs]</a>    <span class="k">def</span> <span class="nf">quit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">event</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+    
+    <span class="k">def</span> <span class="nf">_createMenus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private function _createMenus</span>
+<span class="sd">        function to create mainwindow menus.</span>
+<span class="sd">        commands to be set later.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># --start-- File menu build:</span>
+        <span class="n">filemenu</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Menu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">,</span> <span class="n">tearoff</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mnuimport</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Menu</span><span class="p">(</span><span class="n">filemenu</span><span class="p">,</span> <span class="n">tearoff</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">mnuimport</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Target list&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_menu_import_target_list</span><span class="p">)</span>
+        <span class="n">mnuimport</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Switch list&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_menu_import_switch_list</span><span class="p">)</span>
+        <span class="n">filemenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;New search&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_menu_new_search</span><span class="p">,</span> <span class="n">underline</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">filemenu</span><span class="o">.</span><span class="n">add_cascade</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Import&quot;</span><span class="p">,</span> <span class="n">menu</span><span class="o">=</span><span class="n">mnuimport</span><span class="p">)</span>
+        <span class="n">filemenu</span><span class="o">.</span><span class="n">add_separator</span><span class="p">()</span>
+        <span class="n">filemenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Settings&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_menu_settings</span><span class="p">,</span> <span class="n">underline</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">filemenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Quit&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quit</span><span class="p">,</span> <span class="n">underline</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;Ctrl+Q&quot;</span><span class="p">)</span>
+        <span class="c1">#--end-- File menu build</span>
+
+        <span class="c1">#--start-- help menu build</span>
+        <span class="n">hlpmenu</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Menu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">,</span> <span class="n">tearoff</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">hlpmenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Help&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_help_menu_help</span><span class="p">)</span>
+        <span class="n">hlpmenu</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;About&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_help_menu_about</span><span class="p">)</span>
+        <span class="c1">#--end-- help menu build</span>
+        
+        <span class="c1">#--start-- adding menus to main menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">add_cascade</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;File&quot;</span><span class="p">,</span> <span class="n">menu</span><span class="o">=</span><span class="n">filemenu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="o">.</span><span class="n">add_cascade</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Help&quot;</span><span class="p">,</span> <span class="n">menu</span><span class="o">=</span><span class="n">hlpmenu</span><span class="p">)</span>
+        <span class="c1">#--end-- adding menus to main menu</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">menu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;this faild!!!!&quot;</span><span class="p">)</span>
+            <span class="c1"># master is a toplevel window (Python 1.4/Tkinter 1.63)</span>
+            <span class="n">tk</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;-menu&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menubar</span><span class="p">)</span>
+
+        
+<div class="viewcode-block" id="frm_main.createWidgets"><a class="viewcode-back" href="../frm_main.html#frm_main.frm_main.createWidgets">[docs]</a>    <span class="k">def</span> <span class="nf">createWidgets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates and lays out the widgets for the mainwindow.&quot;&quot;&quot;</span>
+        <span class="c1">#create Menus:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_createMenus</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">)</span></div>
+
+        <span class="c1">#create input boxes:</span>
+        
+
+        
+<span class="c1">##        frame.canvas = tk.Canvas(frame, bg=&quot;white&quot;, width=400, height=400,</span>
+<span class="c1">##                             bd=0, highlightthickness=0)</span>
+<span class="c1">##        frame.canvas.grid(row=&quot;1&quot;, columnspan=&quot;2&quot;)</span>
+        
+<span class="c1">##        self.QUIT = tk.Button(frame,</span>
+<span class="c1">##                              text=&quot;QUIT&quot;,</span>
+<span class="c1">##                              fg=&quot;red&quot;,</span>
+<span class="c1">##                              command=self.destroy)</span>
+<span class="c1">##        self.QUIT.grid(column=&quot;1&quot;, row=&quot;0&quot;)</span>
+
+    <span class="k">def</span> <span class="nf">_file_menu_import_target_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private function _file_menu_import_target_list</span>
+<span class="sd">        opens Dialog to open a file containing a list of ip-adresses or MAC-adresses either separated with comma (,) or one line per target.</span>
+<span class="sd">        TODO: figure out how to do this.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">_file_menu_import_switch_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private function _file_menu_import_switch_list</span>
+<span class="sd">        opens Dialog to open a file containing a list of ip-adresses either separated with comma (,) or new-line (\\n)</span>
+<span class="sd">        TODO: figure out how to do this.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">_file_menu_new_search</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        function _file_menu_new_search</span>
+<span class="sd">        clears all current settings and unloads any files imported.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">_help_menu_help</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private function _help_menu_help</span>
+<span class="sd">        display help-window</span>
+<span class="sd">        TODO: everything!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+    
+    <span class="k">def</span> <span class="nf">_help_menu_about</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private function _help_menu_about</span>
+<span class="sd">        Display Aoutdialog popupwindow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;help__about!!!!&quot;</span><span class="p">)</span>
+        <span class="n">about_dialog</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Toplevel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">about_dialog</span><span class="o">.</span><span class="n">wm_title</span><span class="p">(</span><span class="s2">&quot;About Tracemac v2.0&quot;</span><span class="p">)</span>
+        <span class="n">about_frame</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">about_dialog</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="n">about_frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;texts</span><span class="se">\\</span><span class="s2">about.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">about_text</span><span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">about_label</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">about_frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">about_text</span><span class="p">)</span>
+        <span class="n">about_label</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="n">about_label</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">columnspan</span><span class="o">=</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        
+        <span class="n">about_btn_OK</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">about_frame</span><span class="p">,</span>
+                                 <span class="n">text</span><span class="o">=</span><span class="s2">&quot;OK&quot;</span><span class="p">,</span>
+                                 <span class="n">command</span><span class="o">=</span><span class="n">about_dialog</span><span class="o">.</span><span class="n">destroy</span><span class="p">,</span>
+                                 <span class="n">width</span><span class="o">=</span><span class="s2">&quot;30&quot;</span><span class="p">)</span>
+        <span class="n">about_btn_OK</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+        <span class="n">about_dialog</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;and then some!!!&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_file_menu_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private function _file_menu_settings</span>
+<span class="sd">        Display settingsdialog popupwindow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">settings_dialog</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Toplevel</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">settings_dialog</span><span class="o">.</span><span class="n">wm_title</span><span class="p">(</span><span class="s2">&quot;About Tracemac v2.0&quot;</span><span class="p">)</span>
+        <span class="n">settings_frame</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">settings_dialog</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="n">settings_frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+
+        <span class="n">settings_label</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">settings_frame</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Settings:&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="s2">&quot;Helvetica 24 underline bold&quot;</span><span class="p">)</span>
+        <span class="n">settings_label</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="n">settings_label</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">columnspan</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="n">settings_btn_OK</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">settings_frame</span><span class="p">,</span>
+                                    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;OK&quot;</span><span class="p">,</span>
+                                    <span class="n">command</span><span class="o">=</span><span class="n">settings_dialog</span><span class="o">.</span><span class="n">destroy</span><span class="p">,</span>
+                                    <span class="n">width</span><span class="o">=</span><span class="s2">&quot;10&quot;</span><span class="p">)</span>
+        <span class="n">settings_btn_OK</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+        <span class="n">settings_btn_Cancel</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">settings_frame</span><span class="p">,</span>
+                                        <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Cancel&quot;</span><span class="p">,</span>
+                                        <span class="n">command</span><span class="o">=</span><span class="n">settings_dialog</span><span class="o">.</span><span class="n">destroy</span><span class="p">,</span>
+                                        <span class="n">width</span><span class="o">=</span><span class="s2">&quot;10&quot;</span><span class="p">)</span>
+        <span class="n">settings_btn_Cancel</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">)</span>
+        <span class="n">settings_dialog</span><span class="o">.</span><span class="n">bind_all</span><span class="p">(</span><span class="s2">&quot;&lt;Enter&gt;&quot;</span><span class="p">,</span> <span class="n">settings_dialog</span><span class="o">.</span><span class="n">settings_frame</span><span class="o">.</span><span class="n">settings_btn_OK</span><span class="o">.</span><span class="n">click</span><span class="p">())</span>
+        <span class="n">settings_dialog</span><span class="o">.</span><span class="n">bind_all</span><span class="p">(</span><span class="s2">&quot;&lt;Escape&gt;&quot;</span><span class="p">,</span> <span class="n">settings_dialog</span><span class="o">.</span><span class="n">settings_frame</span><span class="o">.</span><span class="n">settings_btn_Cancel</span><span class="o">.</span><span class="n">click</span><span class="p">())</span>
+        <span class="n">settings_dialog</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">=</span><span class="n">frm_main</span><span class="p">()</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Mattias Måhl.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.7</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
