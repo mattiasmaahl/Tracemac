@@ -3,6 +3,7 @@ Created 2016-04-12
 @author: Mattias Måhl
 """
 from tkinter import *
+from settingsdialog import *
 import tkinter as tk
 import codecs
 import configparser
@@ -18,6 +19,7 @@ class frm_main(tk.Tk):
          app.mainloop()\n\n
     """
     settings = configparser.ConfigParser()
+    settings_file = "../conf/settings.ini"
     
     def __init__(self):
         tk.Tk.__init__(self)
@@ -26,21 +28,22 @@ class frm_main(tk.Tk):
         self.menubar = tk.Menu(self.my_frame)
         self.createWidgets(self.my_frame)
         self.bind_all("<Control-q>", self.quit)
-        settings_file = "../conf/settings.ini"
-        
+        self._create_statusbar(self.my_frame)
         #checks if the settings_file exists, if not it creates it with defaults.
-        if os.path.isfile(settings_file):
-            self.settings.read(settings_file)
+        if os.path.isfile(self.settings_file):
+            self.settings.read(self.settings_file)
         else:
             print("No settings file - reverting to standard and saving file to conf/settings.ini")
             self.settings['DEFAULT'] = { 'community': 'public',
                                     'community_password': 'public' }
             self.settings['userdata'] = {}
-            with open(settings_file, 'w') as configfile:
-                self.settings.write(configfile)
+            _save_settings_to_file()
 
     def quit(self, *event):
         self.destroy()
+
+    def _create_statusbar(self, frame=None):
+        pass
     
     def _createMenus(self, frame=None):
         """
@@ -153,61 +156,20 @@ class frm_main(tk.Tk):
         about_btn_OK.grid(column="1", row="1")
         about_dialog.mainloop()
         print("and then some!!!")
-
+    
     def _file_menu_settings(self):
         """
         private function _file_menu_settings
         Display settingsdialog popupwindow.
         """
-        settings_dialog = tk.Toplevel(self)
-        settings_dialog.wm_title("Settings")
-        settings_frame = tk.Frame(settings_dialog)
-        settings_frame.grid(sticky=(N, S, E, W), padx=(3, 12), pady=(3, 12))
-        settings_label=tk.Label(settings_frame, text="Settings:", font="Helvetica 20 underline bold")
-        #settings_label.config(anchor=(E,W,S,N))
-        settings_label.grid(columnspan=3, row=0, sticky=(E, W))
-        entry = {}
-        tk.Label(settings_frame, text="Defaults", font="Helvetica 8 italic underline").grid(row=1, column=2, sticky=W)
-        
-        row=1
-        for section in self.settings.sections():
-            txt = "Section: " + section
-            tk.Label(settings_frame, text=txt, font="Helvetica 11 bold underline").grid(column=0, row = row, sticky=(N,W), columnspan=2)
-            row += 1
-            for key in self.settings[section]:
-                #print(section, key, self.settings[section][key], row)
-                tk.Label(settings_frame, text=key).grid(row=row, column=0, sticky=W)
-                en = tk.Entry(settings_frame)
-                en.insert(0, self.settings[section][key])
-                en.grid(row=row, column=1, sticky=(E,W))
-                data={key: en}
-                entry[section]=data
-                #entry[key].insert(0, self.settings[section][key])
-                #print(self.settings[section][key])
-                tk.Label(settings_frame, text=self.settings['DEFAULT'][key], font="Helvetica 8 italic").grid(row=row, column=2, sticky="W")
-                row += 1
-                print(row)
-                
-        print (entry)
-        print (row)
-        btn_Ok = tk.Button(settings_frame,
-                           text="OK",
-                           command=settings_dialog.destroy,
-                           width=10)
-        btn_Ok.grid(column=1, row=(row+1), sticky=E)
-        btn_Cancel = tk.Button(settings_frame,
-                               text="Cancel",
-                               command=settings_dialog.destroy,
-                               width=10)
-        btn_Cancel.grid(column=2, row=(row+1), sticky=E)
-        settings_dialog.columnconfigure(0, weight=1)
-        settings_dialog.rowconfigure(0, weight=1)
-        settings_frame.columnconfigure(1, weight=1)
-        settings_dialog.update()
-        settings_dialog.minsize(settings_dialog.winfo_width(), settings_dialog.winfo_height())
-        print(settings_dialog.winfo_height(), settings_dialog.winfo_width())
-        settings_dialog.mainloop()
+        settings_dialog = Settings_dialog(self, self.settings)
+        return_val, changed = settings_dialog.show()
+        if changed:
+            self._save_settings_to_file()
 
+    def _save_settings_to_file(self):
+        with open(self.settings_file, 'w') as configfile:
+                self.settings.write(configfile)
 
 if __name__ == "__main__":
     app=frm_main()
