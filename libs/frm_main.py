@@ -25,13 +25,11 @@ class frm_main(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.wm_state('zoomed')
-        self.my_frame = tk.Frame(master=self)
-        self.my_frame.pack(fill=BOTH)
-        self.menubar = tk.Menu(self.my_frame)
-        self.createWidgets(self.my_frame)
-        self.bind_all("<Control-q>", self.quit)
-        self._create_statusbar()
-        self._create_toolbar()
+        self.mainframe = tk.Frame(master=self, bg="green")
+        self.mainframe.pack(expand=True, fill=BOTH)
+        self.bind_all("<Control-x>", self.quit)
+        self.bind_all("<Control-a>", self.add_target)
+        self.createWidgets()
         
         #checks if the settings_file exists, if not it creates it with defaults.
         if os.path.isfile(self.settings_file):
@@ -46,32 +44,13 @@ class frm_main(tk.Tk):
     def quit(self, *event):
         self.destroy()
 
-    def _create_toolbar(self):
-        self.toolbarframe = Frame(self.my_frame, height=20, bd=1, relief=RAISED)
-        self.addimg = Image.open("../gfx/add.png")
-        addimg = ImageTk.PhotoImage(self.addimg)
-        addbutton = Button(self.toolbarframe, height=20, width=20, image=addimg, relief=FLAT)
-        addbutton.image=addimg
-        addbutton.pack(side=LEFT, padx=2, pady=2)
-        self.toolbarframe.pack(side=TOP, fill=X)
+    def add_target(self):
+        pass
     
-    def _create_statusbar(self):
-        """
-        function _create_statusbar
-        creates a statusbar and places it on bottom left.
-        """
-        self.status = StringVar()
-        self.statusbar = Label(self, textvariable=self.status, bd=1, relief=SUNKEN, anchor=W)
-        self.statusbar.pack(side=BOTTOM, fill=X)
-        self.status.set("Idle")
-    
-    def _createMenus(self, frame=None):
-        """
-        private function _createMenus
-        function to create mainwindow menus.
-        commands to be set later.
-        """
-        # --start-- File menu build:
+    def createWidgets(self):
+        """ Creates and lays out the widgets for the mainwindow."""
+        # create Menus:
+        self.menubar = tk.Menu(self.mainframe)
         filemenu = tk.Menu(self.menubar, tearoff=0)
         mnuimport = tk.Menu(filemenu, tearoff=0)
         mnuimport.add_command(label="Target list", command=self._file_menu_import_target_list)
@@ -80,7 +59,7 @@ class frm_main(tk.Tk):
         filemenu.add_cascade(label="Import", menu=mnuimport)
         filemenu.add_separator()
         filemenu.add_command(label="Settings", command=self._file_menu_settings, underline=0)
-        filemenu.add_command(label="Quit", command=self.quit, underline=0, accelerator="Ctrl+Q")
+        filemenu.add_command(label="Exit", command=self.quit, underline=1, accelerator="Ctrl+X")
         #--end-- File menu build
 
         #--start-- help menu build
@@ -100,35 +79,34 @@ class frm_main(tk.Tk):
             # master is a toplevel window (Python 1.4/Tkinter 1.63)
             tk.call(self, "config", "-menu", self.menubar)
 
-        
-    def createWidgets(self, frame):
-        """ Creates and lays out the widgets for the mainwindow."""
-        #create Menus:
-        self._createMenus(frame=frame)
+            
+        # create Toolbar
+        self.toolbarframe = Frame(self.mainframe, height=20, bd=1, relief=RAISED)
+        self.addimg = Image.open("../gfx/add.png")
+        addimg = ImageTk.PhotoImage(self.addimg)
+        addbutton = Button(self.toolbarframe, height=20, width=20, image=addimg, relief=FLAT)
+        addbutton.image=addimg
+        addbutton.pack(side=LEFT, padx=2, pady=2)
+        self.toolbarframe.pack(side=TOP, fill=X)
 
+
+        # create Statusbar
+        self.status = StringVar()
+        self.statusbar = Label(self, textvariable=self.status, bd=1, relief=SUNKEN, anchor=W)
+        self.statusbar.pack(side=BOTTOM, fill=X)
+        self.status.set("Idle")
+        
         #create input boxes:
-        self.inputframe = Frame(self.my_frame, width=50, bd=1, relief=GROOVE, padx=12, pady=12)
-        self.inputframe.pack(side=RIGHT, fill=Y)
+        self.inputframe = Frame(self.mainframe, width=50, bd=1, relief=GROOVE, padx=12, pady=12)
         Label(self.inputframe, text="Targets to look for:", pady=2).pack()
         self.list_targets = Listbox(self.inputframe)
         self.list_targets.pack()
-        #self.list_targets.config(width=25, height=15)
         Label(self.inputframe, text="Hosts to scan:", pady=2).pack()
         self.list_hosts = Listbox(self.inputframe)
         self.list_hosts.pack()
-        
+        self.inputframe.pack(side=RIGHT, fill=Y)
 
         
-##        frame.canvas = tk.Canvas(frame, bg="white", width=400, height=400,
-##                             bd=0, highlightthickness=0)
-##        frame.canvas.grid(row="1", columnspan="2")
-        
-##        self.QUIT = tk.Button(frame,
-##                              text="QUIT",
-##                              fg="red",
-##                              command=self.destroy)
-##        self.QUIT.grid(column="1", row="0")
-
     def _file_menu_import_target_list(self):
         """
         private function _file_menu_import_target_list
