@@ -8,6 +8,7 @@ import tkinter as tk
 import codecs
 import configparser
 import os.path
+from PIL import Image, ImageTk
 
 
 class frm_main(tk.Tk):
@@ -23,12 +24,15 @@ class frm_main(tk.Tk):
     
     def __init__(self):
         tk.Tk.__init__(self)
-        self.my_frame = tk.Frame(master=self, width=300, height=200)
-        self.my_frame.pack()
+        self.wm_state('zoomed')
+        self.my_frame = tk.Frame(master=self)
+        self.my_frame.pack(fill=BOTH)
         self.menubar = tk.Menu(self.my_frame)
         self.createWidgets(self.my_frame)
         self.bind_all("<Control-q>", self.quit)
-        self._create_statusbar(self.my_frame)
+        self._create_statusbar()
+        self._create_toolbar()
+        
         #checks if the settings_file exists, if not it creates it with defaults.
         if os.path.isfile(self.settings_file):
             self.settings.read(self.settings_file)
@@ -42,8 +46,24 @@ class frm_main(tk.Tk):
     def quit(self, *event):
         self.destroy()
 
-    def _create_statusbar(self, frame=None):
-        pass
+    def _create_toolbar(self):
+        self.toolbarframe = Frame(self.my_frame, height=20, bd=1, relief=RAISED)
+        self.addimg = Image.open("../gfx/add.png")
+        addimg = ImageTk.PhotoImage(self.addimg)
+        addbutton = Button(self.toolbarframe, height=20, width=20, image=addimg, relief=FLAT)
+        addbutton.image=addimg
+        addbutton.pack(side=LEFT, padx=2, pady=2)
+        self.toolbarframe.pack(side=TOP, fill=X)
+    
+    def _create_statusbar(self):
+        """
+        function _create_statusbar
+        creates a statusbar and places it on bottom left.
+        """
+        self.status = StringVar()
+        self.statusbar = Label(self, textvariable=self.status, bd=1, relief=SUNKEN, anchor=W)
+        self.statusbar.pack(side=BOTTOM, fill=X)
+        self.status.set("Idle")
     
     def _createMenus(self, frame=None):
         """
@@ -87,6 +107,15 @@ class frm_main(tk.Tk):
         self._createMenus(frame=frame)
 
         #create input boxes:
+        self.inputframe = Frame(self.my_frame, width=50, bd=1, relief=GROOVE, padx=12, pady=12)
+        self.inputframe.pack(side=RIGHT, fill=Y)
+        Label(self.inputframe, text="Targets to look for:", pady=2).pack()
+        self.list_targets = Listbox(self.inputframe)
+        self.list_targets.pack()
+        #self.list_targets.config(width=25, height=15)
+        Label(self.inputframe, text="Hosts to scan:", pady=2).pack()
+        self.list_hosts = Listbox(self.inputframe)
+        self.list_hosts.pack()
         
 
         
@@ -136,7 +165,6 @@ class frm_main(tk.Tk):
         private function _help_menu_about
         Display Aoutdialog popupwindow.
         """
-        print("help__about!!!!")
         about_dialog = tk.Toplevel(self)
         about_dialog.wm_title("About Tracemac v2.0")
         about_frame = tk.Frame(about_dialog, width=200, height=300)
