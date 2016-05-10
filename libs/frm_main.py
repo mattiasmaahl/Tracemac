@@ -11,6 +11,7 @@ import os.path
 from PIL import Image, ImageTk
 from toolbar import Tooltip, Toolbar
 from collections import OrderedDict as OD
+from logwindow import Logwindow
 
 
 class frm_main(tk.Tk):
@@ -23,6 +24,7 @@ class frm_main(tk.Tk):
     """
     settings = configparser.ConfigParser()
     settings_file = "../conf/settings.ini"
+    viewlogg = False
     
     def __init__(self):
         tk.Tk.__init__(self)
@@ -32,7 +34,9 @@ class frm_main(tk.Tk):
         self.mainframe.pack(expand=True, fill=BOTH)
         self.bind_all("<Control-x>", self.quit)
         self.bind_all("<Control-a>", self.add_target)
+        self.logg = Logwindow(self.mainframe)
         self.createWidgets()
+        
         
         #checks if the settings_file exists, if not it creates it with defaults.
         if os.path.isfile(self.settings_file):
@@ -74,7 +78,14 @@ class frm_main(tk.Tk):
         editmenu.add_command(label="Add host(s)", underline=4, accelerator="Ctrl-H", command=self._edit_menu_add_host_to_list)
         editmenu.add_command(label="Edit selected host", command=self._edit_menu_edit_selected_host)
         editmenu.add_command(label="Delete selected host", command=self._edit_menu_del_selected_host)
+        editmenu.add_separator()
+        editmenu.add_command(label="Clear log window", command=self.logg.clear)
         #--end-- edit menu build
+
+        #--start-- view menu
+        viewmenu = Menu(self.menubar, tearoff=0)
+        viewmenu.add_checkbutton(label="Show/hide Logg", onvalue=True, offvalue=False, variable=self.viewlogg, command=self._viewmenu_show_window_pane)
+        #--end-- viewmenu
         
         #--start-- help menu build
         hlpmenu = tk.Menu(self.menubar, tearoff=0)
@@ -85,6 +96,7 @@ class frm_main(tk.Tk):
         #--start-- adding menus to main menu
         self.menubar.add_cascade(label="File", menu=filemenu)
         self.menubar.add_cascade(label="Edit", menu=editmenu)
+        self.menubar.add_cascade(label="View", menu=viewmenu)
         self.menubar.add_cascade(label="Help", menu=hlpmenu)
         #--end-- adding menus to main menu
         try:
@@ -96,7 +108,8 @@ class frm_main(tk.Tk):
 
         #create Toolbar
         toolbar = Toolbar(parent=self.mainframe)
-        toolbar.add(wtype="button", gfxpath="../gfx/start.png", tooltip="Start the search")
+        toolbar.add(wtype="button", gfxpath="../gfx/start.png",
+                    tooltip="Start the search", command=self.addtext)
         toolbar.add(wtype="button", gfxpath="../gfx/new.png", tooltip="Clears all results and start fresh")
         toolbar.add(wtype="separator")
         toolbar.add(wtype="button", gfxpath="../gfx/addtarget.png", tooltip="Clears all results and start fresh")
@@ -132,8 +145,24 @@ class frm_main(tk.Tk):
         self.list_hosts_toolbar.show()
         self.inputframe.pack(side=RIGHT, fill=Y)
 
+        # display Logwindow
+        
+        #self.logg.show()
 
 
+
+    def addtext(self, *args):
+            self.logg.println("test", "text2", "text3")
+            self.logg.println("test", "text2", "text3", prefix="switch1")
+
+    def _viewmenu_show_window_pane(self, *args):
+        print(self.viewlogg)
+        self.viewlogg = not self.viewlogg
+        if self.viewlogg:
+            self.logg.show()
+        else:
+            self.logg.hide()
+    
     def _edit_menu_add_target_to_list(self): pass
     def _edit_menu_del_selected_target(self): pass
     def _edit_menu_edit_selected_target(self): pass
