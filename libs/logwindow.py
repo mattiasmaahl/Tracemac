@@ -9,10 +9,15 @@ from tkinter import *
 
 
 class Logwindow(object):
-    
+    height=60
+    bd=1
+    relief=SUNKEN
     def __init__(self, parent):
         self.text = StringVar()
-        self.frame = Frame(parent, height=80, bd=1, relief=SUNKEN)
+        self.frame = Frame(parent,
+                           height=self.height,
+                           bd=self.bd,
+                           relief=self.relief)
         self.scrollbar = Scrollbar(self.frame)
         self.scrollbar.pack(side=RIGHT, fill=Y)
         self.label = Text(self.frame,

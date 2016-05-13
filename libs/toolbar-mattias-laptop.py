@@ -46,7 +46,6 @@ class Tooltip(object):
 class Toolbar(object):
     def __init__(self, parent):
         self.frame = Frame(parent, height=25, bd=1, relief=RAISED)
-        self.widgets = OrderedDict()
 
     def show(self):
         self.frame.pack(side=TOP, fill=X)
@@ -57,16 +56,9 @@ class Toolbar(object):
                 tmpaddimg = Image.open(gfxpath)
                 addimg = ImageTk.PhotoImage(tmpaddimg)
                 addbutton = Button(self.frame, height=20, width=20, image=addimg, relief=FLAT)
-                if command: addbutton.config(command=command)   
+                if command: addbutton.config(command=command)
                 addbutton.image=addimg
                 addbutton.pack(side=LEFT, padx=2, pady=2)
                 if tooltip: addbutton_ttp = Tooltip(addbutton,tooltip)
             elif wtype=="separator":
                 Label(self.frame, text="|", font=("times", "12", "normal")).pack(side=LEFT, padx=4, pady=2)
-                
-    def remove(self, *, ID=None):
-        pass
-    
-    def movewidget(self, *, oldid=None, newid=None):
-        pass
-    

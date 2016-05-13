@@ -1,7 +1,9 @@
 """
+File frm_amin.py
 Created 2016-04-12
 @author: Mattias Måhl
 """
+
 from tkinter import *
 from settingsdialog import *
 import tkinter as tk
@@ -12,7 +14,7 @@ from PIL import Image, ImageTk
 from toolbar import Tooltip, Toolbar
 from collections import OrderedDict as OD
 from logwindow import Logwindow
-
+from datacollection_dlg import Collectdata
 
 class frm_main(tk.Tk):
     """Start object to render the application window.\n
@@ -33,7 +35,7 @@ class frm_main(tk.Tk):
         self.minsize(width=800, height=640)
         self.mainframe.pack(expand=True, fill=BOTH)
         self.bind_all("<Control-x>", self.quit)
-        self.bind_all("<Control-a>", self.add_target)
+        self.bind_all("<Control-t>", self.add_target)
         self.logg = Logwindow(self.mainframe)
         self.createWidgets()
         
@@ -51,9 +53,15 @@ class frm_main(tk.Tk):
     def quit(self, *event):
         self.destroy()
 
-    def add_target(self):
-        pass
-    
+    def add_target(self, *event):
+        datacol = Collectdata(self, title="Add target")
+        valid, ip, ip2, mask = datacol.show()
+        #call function to add data to widgets.
+
+    def edit_target(self, *event):
+        d = Collectdata(self, title="Edit target", edit="test string")
+        valid, ip, ip2, mask = d.show()
+
     def createWidgets(self):
         """ Creates and lays out the widgets for the mainwindow."""
         # create Menus:
@@ -108,14 +116,13 @@ class frm_main(tk.Tk):
 
         #create Toolbar
         toolbar = Toolbar(parent=self.mainframe)
-        toolbar.add(wtype="button", gfxpath="../gfx/start.png",
-                    tooltip="Start the search", command=self.addtext)
+        toolbar.add(wtype="button", gfxpath="../gfx/start.png", tooltip="Start the search", command=self.addtext)
         toolbar.add(wtype="button", gfxpath="../gfx/new.png", tooltip="Clears all results and start fresh")
         toolbar.add(wtype="separator")
-        toolbar.add(wtype="button", gfxpath="../gfx/addtarget.png", tooltip="Clears all results and start fresh")
-        toolbar.add(wtype="button", gfxpath="../gfx/addhost.png", tooltip="Clears all results and start fresh")
+        toolbar.add(wtype="button", gfxpath="../gfx/addtarget.png", tooltip="Add target or a range of targets to targetslist", command=self.add_target)
+        toolbar.add(wtype="button", gfxpath="../gfx/addhost.png", tooltip="Add a host or range of hosts to hostslist")
         toolbar.add(wtype="separator")
-        toolbar.add(wtype="button", gfxpath="../gfx/exit.png", tooltip="Clears all results and start fresh (Ctrl-X)", command=self.quit)
+        toolbar.add(wtype="button", gfxpath="../gfx/exit.png", tooltip="Exits the program. (Ctrl-X)", command=self.quit)
         toolbar.show()
 
         # create Statusbar
@@ -130,8 +137,8 @@ class frm_main(tk.Tk):
         self.list_targets = Listbox(self.inputframe)
         self.list_targets.pack(side=TOP, pady=5)
         self.list_targets_toolbar = Toolbar(parent=self.inputframe)
-        self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/addtarget.png", tooltip="Add new target")
-        self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/edit.png", tooltip="Edit selected target")
+        self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/addtarget.png", tooltip="Add new target", command=self.add_target)
+        self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/edit.png", tooltip="Edit selected target", command=self.edit_target)
         self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/trash.png", tooltip="Delete selected target")
         self.list_targets_toolbar.show()
         Frame(self.inputframe, height=2, bd=1, relief=SUNKEN).pack(fill=X, padx=0, pady=10)
@@ -163,9 +170,11 @@ class frm_main(tk.Tk):
         else:
             self.logg.hide()
     
-    def _edit_menu_add_target_to_list(self): pass
+    def _edit_menu_add_target_to_list(self):
+        self.add_target()
     def _edit_menu_del_selected_target(self): pass
-    def _edit_menu_edit_selected_target(self): pass
+    def _edit_menu_edit_selected_target(self):
+        self.edit_target()
     def _edit_menu_add_host_to_list(self): pass
     def _edit_menu_del_selected_host(self): pass
     def _edit_menu_edit_selected_host(self): pass
