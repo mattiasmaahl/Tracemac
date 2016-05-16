@@ -31,6 +31,7 @@ class frm_main(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.wm_state('zoomed')
+        self.wm_title("Tracemac 2.0")
         self.mainframe = tk.Frame(master=self, bg="white")
         self.minsize(width=800, height=640)
         self.mainframe.pack(expand=True, fill=BOTH)
@@ -56,11 +57,18 @@ class frm_main(tk.Tk):
     def add_target(self, *event):
         datacol = Collectdata(self, title="Add target")
         valid, ip, ip2, mask = datacol.show()
+        self.list_targets.insert(END, ip)
         #call function to add data to widgets.
 
     def edit_target(self, *event):
-        d = Collectdata(self, title="Edit target", edit="test string")
-        valid, ip, ip2, mask = d.show()
+        #Need to check if anything is selected!
+        curselec = self.list_targets.curselection()
+        if curselec:
+            print(self.list_targets.get(curselec))
+            d = Collectdata(self, title="Edit target", edit=self.list_targets.get(curselec))
+            valid, ip, ip2, mask = d.show()
+            print(valid, ip, ip2, mask)
+
 
     def createWidgets(self):
         """ Creates and lays out the widgets for the mainwindow."""

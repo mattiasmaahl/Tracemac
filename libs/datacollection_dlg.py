@@ -58,7 +58,7 @@ class Collectdata(object):
     def show(self):
         self.rootdlg.wait_window()
         if self.Cancel:
-            return None
+            return None, None, None, None
         else:
             return self.returnvalues
 
