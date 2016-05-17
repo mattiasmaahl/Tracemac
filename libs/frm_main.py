@@ -1,7 +1,7 @@
 """
 File frm_amin.py
 Created 2016-04-12
-@author: Mattias Maahl
+@author: Mattias Måhl
 """
 
 from tkinter import *
