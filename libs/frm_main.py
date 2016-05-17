@@ -81,6 +81,7 @@ class frm_main(tk.Tk):
             d = Collectdata(self, title="Edit target", edit=self.list_targets.get(curselec), gfxpath=self.gfxpath)
             valid, ip, ip2, mask = d.show()
             print(valid, ip, ip2, mask)
+            self.list_targets.update(curselec[0], ip)
 
 
     def createWidgets(self):
