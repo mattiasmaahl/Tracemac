@@ -23,6 +23,20 @@ else:
     from libs.datacollection_dlg import Collectdata
     from libs.settingsdialog import Settings_dialog
 
+class ListVar(Variable):
+    _list = list()
+    def get(self):
+        b="("
+        for a in self._list:
+            b += "'" + a + "',"
+        b += ")"
+        return b
+
+    def set(self, value):
+        self._list.append(value)
+    def update(self, index, value):
+        self._list[index] = value
+
 class frm_main(tk.Tk):
     """Start object to render the application window.\n
     use:\n
@@ -77,11 +91,12 @@ class frm_main(tk.Tk):
         #Need to check if anything is selected!
         curselec = self.list_targets.curselection()
         if curselec:
-            print(self.list_targets.get(curselec))
+            #print(self.list_targets.get(curselec))
             d = Collectdata(self, title="Edit target", edit=self.list_targets.get(curselec), gfxpath=self.gfxpath)
             valid, ip, ip2, mask = d.show()
-            print(valid, ip, ip2, mask)
-            self.list_targets.update(curselec[0], ip)
+            #print(valid, ip, ip2, mask)
+            print(self.lst_targets.get())
+            #self.list_targets.itemconfig(curselec[0], text=ip)
 
 
     def createWidgets(self):
@@ -156,7 +171,8 @@ class frm_main(tk.Tk):
         #create input boxes:
         self.inputframe = Frame(self.mainframe, width=50, bd=1, relief=GROOVE, padx=12, pady=12)
         Label(self.inputframe, text="Targets to look for:", pady=2).pack()
-        self.list_targets = Listbox(self.inputframe)
+        self.lst_targets = ListVar()
+        self.list_targets = Listbox(self.inputframe, listvariable=self.lst_targets)
         self.list_targets.pack(side=TOP, pady=5)
         self.list_targets_toolbar = Toolbar(parent=self.inputframe)
         self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png", tooltip="Add new target", command=self.add_target)
@@ -266,7 +282,7 @@ class frm_main(tk.Tk):
         return_val, changed = settings_dialog.show()
         if changed:
             self._save_settings_to_file()
-
+    
     def _save_settings_to_file(self):
         with open(self.settings_file, 'w') as configfile:
                 self.settings.write(configfile)
