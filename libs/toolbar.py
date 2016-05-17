@@ -7,6 +7,7 @@ TOOLBAR - lib
 from tkinter import *
 from collections import OrderedDict
 from PIL import Image, ImageTk
+import os.path
 
 class Tooltip(object):
     """

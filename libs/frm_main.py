@@ -1,7 +1,7 @@
 """
 File frm_amin.py
 Created 2016-04-12
-@author: Mattias Måhl
+@author: Mattias Maahl
 """
 
 from tkinter import *
@@ -30,7 +30,7 @@ class frm_main(tk.Tk):
     
     def __init__(self):
         tk.Tk.__init__(self)
-        self.wm_state('zoomed')
+		##        self.wm_state()
         self.wm_title("Tracemac 2.0")
         self.mainframe = tk.Frame(master=self, bg="white")
         self.minsize(width=800, height=640)
