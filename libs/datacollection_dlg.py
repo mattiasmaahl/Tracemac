@@ -4,9 +4,17 @@ Author Mattias Måhl
 Created 2016-05-11
 """
 
+print("datacollection: ", __name__)
+
 from tkinter import *
-from toolbar import Tooltip
 from PIL import Image, ImageTk
+
+if __name__ == "libs.datacollection_dlg":
+    from libs.toolbar import Tooltip
+else:
+    from toolbar import Tooltip
+
+
 
 class regexp_strings(object):
     ipv4 = "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
@@ -14,8 +22,8 @@ class regexp_strings(object):
 
 class Collectdata(object):
     Cancel=False
-    def __init__(self, parent=None, title="Add target", edit=None):
-        
+    def __init__(self, parent=None, title="Add target", edit=None, gfxpath="gfx/"):
+        self.gfxpath=gfxpath
         if parent:
             self.rootdlg = Toplevel(parent)
         else:
@@ -30,7 +38,7 @@ class Collectdata(object):
         Label(self.frame, text="Enter your target host(s) or network:").grid(row=0, column=0, columnspan=2, sticky=W)
         self.data = StringVar()
         if edit: self.data.set(str(edit))
-        tmpinfo = Image.open("../gfx/info.png")
+        tmpinfo = Image.open(self.gfxpath + "info.png")
         infoimg = ImageTk.PhotoImage(tmpinfo)
         lblimg = Label(self.frame, image=infoimg)
         lblimg.photo = infoimg
@@ -46,6 +54,9 @@ class Collectdata(object):
                         column=0,
                         sticky=(W, E))
         self.default_color = self.entry.cget('background')
+        self.entry.focus()
+        self.rootdlg.bind("<Return>", self.Collectiondata_OK)
+        self.rootdlg.bind("<Escape>", self.Collectiondata_Cancel)
         btn1=Button(self.frame, text="Cancel", height=1, width=7, command=self.Collectiondata_Cancel)
         btn2=Button(self.frame, text="OK", height=1, width=7, command=self.Collectiondata_OK)
         btn1.grid(row=2, column=2, sticky=E)

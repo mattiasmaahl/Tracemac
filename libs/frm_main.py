@@ -5,16 +5,23 @@ Created 2016-04-12
 """
 
 from tkinter import *
-from settingsdialog import *
 import tkinter as tk
 import codecs
 import configparser
-import os.path
+import os.path, os
 from PIL import Image, ImageTk
-from toolbar import Tooltip, Toolbar
 from collections import OrderedDict as OD
-from logwindow import Logwindow
-from datacollection_dlg import Collectdata
+
+if __name__ == "__main__":
+    from toolbar import Tooltip, Toolbar
+    from logwindow import Logwindow
+    from datacollection_dlg import Collectdata
+    from settingsdialog import Settings_dialog
+else:
+    from libs.toolbar import Tooltip, Toolbar
+    from libs.logwindow import Logwindow
+    from libs.datacollection_dlg import Collectdata
+    from libs.settingsdialog import Settings_dialog
 
 class frm_main(tk.Tk):
     """Start object to render the application window.\n
@@ -25,11 +32,14 @@ class frm_main(tk.Tk):
          app.mainloop()\n\n
     """
     settings = configparser.ConfigParser()
-    settings_file = "../conf/settings.ini"
+    settings_file = "settings.ini"
     viewlogg = False
+    gfxpath = "gfx/"
     
-    def __init__(self):
+    def __init__(self, settingspath="conf/", gfxpath="gfx/"):
         tk.Tk.__init__(self)
+        self.settings_file = os.path.join(settingspath, self.settings_file)
+        self.gfxpath = gfxpath
 		##        self.wm_state()
         self.wm_title("Tracemac 2.0")
         self.mainframe = tk.Frame(master=self, bg="white")
@@ -49,13 +59,16 @@ class frm_main(tk.Tk):
             self.settings['DEFAULT'] = { 'community': 'public',
                                     'community_password': 'public' }
             self.settings['userdata'] = {}
-            _save_settings_to_file()
+            self._save_settings_to_file()
 
     def quit(self, *event):
+        """
+        master frame destroy. Quits the application.
+        """
         self.destroy()
 
     def add_target(self, *event):
-        datacol = Collectdata(self, title="Add target")
+        datacol = Collectdata(self, title="Add target", gfxpath=self.gfxpath)
         valid, ip, ip2, mask = datacol.show()
         self.list_targets.insert(END, ip)
         #call function to add data to widgets.
@@ -65,7 +78,7 @@ class frm_main(tk.Tk):
         curselec = self.list_targets.curselection()
         if curselec:
             print(self.list_targets.get(curselec))
-            d = Collectdata(self, title="Edit target", edit=self.list_targets.get(curselec))
+            d = Collectdata(self, title="Edit target", edit=self.list_targets.get(curselec), gfxpath=self.gfxpath)
             valid, ip, ip2, mask = d.show()
             print(valid, ip, ip2, mask)
 
@@ -124,13 +137,13 @@ class frm_main(tk.Tk):
 
         #create Toolbar
         toolbar = Toolbar(parent=self.mainframe)
-        toolbar.add(wtype="button", gfxpath="../gfx/start.png", tooltip="Start the search", command=self.addtext)
-        toolbar.add(wtype="button", gfxpath="../gfx/new.png", tooltip="Clears all results and start fresh")
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "start.png", tooltip="Start the search", command=self.addtext)
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "new.png", tooltip="Clears all results and start fresh")
         toolbar.add(wtype="separator")
-        toolbar.add(wtype="button", gfxpath="../gfx/addtarget.png", tooltip="Add target or a range of targets to targetslist", command=self.add_target)
-        toolbar.add(wtype="button", gfxpath="../gfx/addhost.png", tooltip="Add a host or range of hosts to hostslist")
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png", tooltip="Add target or a range of targets to targetslist", command=self.add_target)
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png", tooltip="Add a host or range of hosts to hostslist")
         toolbar.add(wtype="separator")
-        toolbar.add(wtype="button", gfxpath="../gfx/exit.png", tooltip="Exits the program. (Ctrl-X)", command=self.quit)
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "exit.png", tooltip="Exits the program. (Ctrl-X)", command=self.quit)
         toolbar.show()
 
         # create Statusbar
@@ -145,18 +158,18 @@ class frm_main(tk.Tk):
         self.list_targets = Listbox(self.inputframe)
         self.list_targets.pack(side=TOP, pady=5)
         self.list_targets_toolbar = Toolbar(parent=self.inputframe)
-        self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/addtarget.png", tooltip="Add new target", command=self.add_target)
-        self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/edit.png", tooltip="Edit selected target", command=self.edit_target)
-        self.list_targets_toolbar.add(wtype="button", gfxpath="../gfx/trash.png", tooltip="Delete selected target")
+        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png", tooltip="Add new target", command=self.add_target)
+        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "edit.png", tooltip="Edit selected target", command=self.edit_target)
+        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "trash.png", tooltip="Delete selected target")
         self.list_targets_toolbar.show()
         Frame(self.inputframe, height=2, bd=1, relief=SUNKEN).pack(fill=X, padx=0, pady=10)
         Label(self.inputframe, text="Hosts to scan:", pady=2).pack()
         self.list_hosts = Listbox(self.inputframe)
         self.list_hosts.pack(side=TOP, pady=5)
         self.list_hosts_toolbar = Toolbar(parent=self.inputframe)
-        self.list_hosts_toolbar.add(wtype="button", gfxpath="../gfx/addhost.png", tooltip="Add new host")
-        self.list_hosts_toolbar.add(wtype="button", gfxpath="../gfx/edit.png", tooltip="Edit selected host")
-        self.list_hosts_toolbar.add(wtype="button", gfxpath="../gfx/trash.png", tooltip="Delete selected host")
+        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png", tooltip="Add new host")
+        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "edit.png", tooltip="Edit selected host")
+        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "trash.png", tooltip="Delete selected host")
         self.list_hosts_toolbar.show()
         self.inputframe.pack(side=RIGHT, fill=Y)
 
@@ -258,5 +271,5 @@ class frm_main(tk.Tk):
                 self.settings.write(configfile)
 
 if __name__ == "__main__":
-    app=frm_main()
+    app=frm_main(settingspath="../conf/", gfxpath="../gfx/")
     app.mainloop()
