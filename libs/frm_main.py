@@ -23,26 +23,12 @@ else:
     from libs.datacollection_dlg import Collectdata
     from libs.settingsdialog import Settings_dialog
 
-class ListVar(Variable):
-    _list = list()
-    def get(self):
-        b="("
-        for a in self._list:
-            b += "'" + a + "',"
-        b += ")"
-        return b
-
-    def set(self, value):
-        self._list.append(value)
-    def update(self, index, value):
-        self._list[index] = value
-
 class frm_main(tk.Tk):
     """Start object to render the application window.\n
     use:\n
     import libs.frm_main as mainwindow\n
     if __name__ == "__main__":\n
-         app = mainwindow.App()\n
+         app = mainwindow()\n
          app.mainloop()\n\n
     """
     settings = configparser.ConfigParser()
@@ -59,10 +45,12 @@ class frm_main(tk.Tk):
         self.mainframe = tk.Frame(master=self, bg="white")
         self.minsize(width=800, height=640)
         self.mainframe.pack(expand=True, fill=BOTH)
-        self.bind_all("<Control-x>", self.quit)
-        self.bind_all("<Control-t>", self.add_target)
         self.logg = Logwindow(self.mainframe)
         self.createWidgets()
+        self.bind_all("<Control-x>", self.quit)
+        self.bind_all("<Control-t>", self.list_add(widget=self.list_targets))
+        self.bind_all("<Control-h>", self.list_add(widget=self.list_hosts))
+        self.list_targets.insert(END, "1.1.1.1")
         
         
         #checks if the settings_file exists, if not it creates it with defaults.
@@ -81,23 +69,43 @@ class frm_main(tk.Tk):
         """
         self.destroy()
 
-    def add_target(self, *event):
-        datacol = Collectdata(self, title="Add target", gfxpath=self.gfxpath)
+    def list_add(self, widget=None):
+        """add new target to list of targets"""
+        datacol = Collectdata(self, title="Enter IP-addres", gfxpath=self.gfxpath)
         valid, ip, ip2, mask = datacol.show()
-        self.list_targets.insert(END, ip)
+        widget.insert(END, ip)
+        #TODO: add check to validate non-doubles!
+        
         #call function to add data to widgets.
 
-    def edit_target(self, *event):
+    def edit_item(self, widget=None):
+        """Edits selected target"""
         #Need to check if anything is selected!
-        curselec = self.list_targets.curselection()
+        curselec = widget.curselection()
         if curselec:
-            #print(self.list_targets.get(curselec))
-            d = Collectdata(self, title="Edit target", edit=self.list_targets.get(curselec), gfxpath=self.gfxpath)
+            index = int(curselec[0])
+            curitem = widget.get(index)
+            d = Collectdata(self, title="Edit target", edit=widget.get(curselec), gfxpath=self.gfxpath)
             valid, ip, ip2, mask = d.show()
-            #print(valid, ip, ip2, mask)
-            print(self.lst_targets.get())
-            #self.list_targets.itemconfig(curselec[0], text=ip)
+            if ip is not curitem:
+                try:
+                    widget.delete(index)
+                except:
+                    pass
+                widget.insert(index, ip)
 
+    def delete_item(self, widget=None):
+        try:
+            curindex = widget.curselection()
+            curtarget = widget.get(curindex)
+            ret = messagebox.askyesnocancel(title="Delete?", message="Do you want to delete target:\n%s" % curtarget)
+            if ret is True:
+                try:
+                    widget.delete(curindex)
+                except:
+                    pass
+        except:
+            messagebox.showinfo(title="Info", message="Nothing selected!")
 
     def createWidgets(self):
         """ Creates and lays out the widgets for the mainwindow."""
@@ -153,13 +161,18 @@ class frm_main(tk.Tk):
 
         #create Toolbar
         toolbar = Toolbar(parent=self.mainframe)
-        toolbar.add(wtype="button", gfxpath=self.gfxpath + "start.png", tooltip="Start the search", command=self.addtext)
-        toolbar.add(wtype="button", gfxpath=self.gfxpath + "new.png", tooltip="Clears all results and start fresh")
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "start.png",
+                    tooltip="Start the search", command=self.addtext)
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "new.png",
+                    tooltip="Clears all results and start fresh")
         toolbar.add(wtype="separator")
-        toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png", tooltip="Add target or a range of targets to targetslist", command=self.add_target)
-        toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png", tooltip="Add a host or range of hosts to hostslist")
-        toolbar.add(wtype="separator")
-        toolbar.add(wtype="button", gfxpath=self.gfxpath + "exit.png", tooltip="Exits the program. (Ctrl-X)", command=self.quit)
+##        toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png",
+##                    tooltip="Add target or a range of targets to targetslist", command=self.list_add)
+##        toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png",
+##                    tooltip="Add a host or range of hosts to hostslist")
+##        toolbar.add(wtype="separator")
+        toolbar.add(wtype="button", gfxpath=self.gfxpath + "exit.png",
+                    tooltip="Exits the program. (Ctrl-X)", command=self.quit)
         toolbar.show()
 
         # create Statusbar
@@ -171,22 +184,27 @@ class frm_main(tk.Tk):
         #create input boxes:
         self.inputframe = Frame(self.mainframe, width=50, bd=1, relief=GROOVE, padx=12, pady=12)
         Label(self.inputframe, text="Targets to look for:", pady=2).pack()
-        self.lst_targets = ListVar()
-        self.list_targets = Listbox(self.inputframe, listvariable=self.lst_targets)
+        self.list_targets = Listbox(self.inputframe, selectmode=BROWSE)
         self.list_targets.pack(side=TOP, pady=5)
         self.list_targets_toolbar = Toolbar(parent=self.inputframe)
-        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png", tooltip="Add new target", command=self.add_target)
-        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "edit.png", tooltip="Edit selected target", command=self.edit_target)
-        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "trash.png", tooltip="Delete selected target")
+        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png",
+                                      tooltip="Add new target", command=lambda: self.list_add(widget=self.list_targets))
+        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "edit.png",
+                                      tooltip="Edit selected target", command=lambda: self.edit_item(widget=self.list_targets))
+        self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "trash.png",
+                                      tooltip="Delete selected target", command=lambda: self.delete_item(widget=self.list_targets))
         self.list_targets_toolbar.show()
         Frame(self.inputframe, height=2, bd=1, relief=SUNKEN).pack(fill=X, padx=0, pady=10)
         Label(self.inputframe, text="Hosts to scan:", pady=2).pack()
-        self.list_hosts = Listbox(self.inputframe)
+        self.list_hosts = Listbox(self.inputframe, selectmode=BROWSE)
         self.list_hosts.pack(side=TOP, pady=5)
         self.list_hosts_toolbar = Toolbar(parent=self.inputframe)
-        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png", tooltip="Add new host")
-        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "edit.png", tooltip="Edit selected host")
-        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "trash.png", tooltip="Delete selected host")
+        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png",
+                                    tooltip="Add new host", command=lambda: self.list_add(self.list_hosts))
+        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "edit.png",
+                                    tooltip="Edit selected host", command=lambda: self.edit_item(widget=self.list_hosts))
+        self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "trash.png",
+                                    tooltip="Delete selected host", command=lambda: self.delete_item(widget=self.list_hosts))
         self.list_hosts_toolbar.show()
         self.inputframe.pack(side=RIGHT, fill=Y)
 
@@ -209,10 +227,11 @@ class frm_main(tk.Tk):
             self.logg.hide()
     
     def _edit_menu_add_target_to_list(self):
-        self.add_target()
-    def _edit_menu_del_selected_target(self): pass
+        self.list_add(widget=self.list_targets)
+    def _edit_menu_del_selected_target(self):
+        self.delete_item(widget=self.list_targets)
     def _edit_menu_edit_selected_target(self):
-        self.edit_target()
+        self.edit_item(widget=self.list_targets)
     def _edit_menu_add_host_to_list(self): pass
     def _edit_menu_del_selected_host(self): pass
     def _edit_menu_edit_selected_host(self): pass

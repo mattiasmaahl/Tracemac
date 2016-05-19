@@ -4,8 +4,6 @@ Author Mattias Måhl
 Created 2016-05-11
 """
 
-print("datacollection: ", __name__)
-
 from tkinter import *
 from PIL import Image, ImageTk
 
@@ -37,7 +35,6 @@ class Collectdata(object):
         self.frame.grid(row=0, column=0, sticky=(N, E, W, S), padx=pad, pady=pad, ipadx=pad, ipady=pad)
         Label(self.frame, text="Enter your target host(s) or network:").grid(row=0, column=0, columnspan=2, sticky=W)
         self.data = StringVar()
-        if edit: self.data.set(str(edit))
         tmpinfo = Image.open(self.gfxpath + "info.png")
         infoimg = ImageTk.PhotoImage(tmpinfo)
         lblimg = Label(self.frame, image=infoimg)
@@ -54,6 +51,7 @@ class Collectdata(object):
                         column=0,
                         sticky=(W, E))
         self.default_color = self.entry.cget('background')
+        if edit: self.data.set(str(edit))
         self.entry.focus()
         self.rootdlg.bind("<Return>", self.Collectiondata_OK)
         self.rootdlg.bind("<Escape>", self.Collectiondata_Cancel)
