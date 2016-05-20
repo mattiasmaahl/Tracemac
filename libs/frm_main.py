@@ -40,7 +40,6 @@ class frm_main(tk.Tk):
         tk.Tk.__init__(self)
         self.settings_file = os.path.join(settingspath, self.settings_file)
         self.gfxpath = gfxpath
-		##        self.wm_state()
         self.wm_title("Tracemac 2.0")
         self.mainframe = tk.Frame(master=self, bg="white")
         self.minsize(width=800, height=640)
@@ -48,10 +47,9 @@ class frm_main(tk.Tk):
         self.logg = Logwindow(self.mainframe)
         self.createWidgets()
         self.bind_all("<Control-x>", self.quit)
-        self.bind_all("<Control-t>", self.list_add(widget=self.list_targets))
-        self.bind_all("<Control-h>", self.list_add(widget=self.list_hosts))
+        self.bind_all("<Control-t>", lambda x:self.list_add(widget=self.list_targets))
+        self.bind_all("<Control-h>", lambda x:self.list_add(widget=self.list_hosts))
         self.list_targets.insert(END, "1.1.1.1")
-        
         
         #checks if the settings_file exists, if not it creates it with defaults.
         if os.path.isfile(self.settings_file):
@@ -73,11 +71,38 @@ class frm_main(tk.Tk):
         """add new target to list of targets"""
         datacol = Collectdata(self, title="Enter IP-addres", gfxpath=self.gfxpath)
         valid, ip, ip2, mask = datacol.show()
-        widget.insert(END, ip)
-        #TODO: add check to validate non-doubles!
+        lst = widget.get(0, END)
+        if valid:
+            if ip and ip2:
+                #It's a range
+                print("IT's a range!! %s-%s" %(ip, ip2))
+            elif ip and mask and not ip2:
+                #It's a network with a mask
+                #Need to deside how to add these to the list?!?!
+                print("It's a Network %s/%s" % (ip, mask))
+                if len(mask) < 3:
+                    mask = self.convertmask(int(mask))
+                print("New mask:", mask)
+            elif ip and not ip2 and not mask:
+                #It's a single IP-address ( same as /32 mask )
+                print("It's a single ip-adress:", ip)
+                if ip in lst:
+                    print(lst)
+                    messagebox.showinfo("message", "Ip %s is allready in the list of targets!" % ip)
+                else:
+                    widget.insert(END, ip)
+    @staticmethod
+    def convertmask(mask:int) -> str:
+        b = newmask = ""
+        cnt=0
+        for a in range(32):
+            b += "1" if a <= mask else "0"
+        nums = [int(b[i:i+8], 2) for i in range(0, 32, 8)]
         
-        #call function to add data to widgets.
-
+        for cnt, item in enumerate(nums):
+            newmask += str(item) + "." if cnt < 3 else str(item)
+        return newmask
+    
     def edit_item(self, widget=None):
         """Edits selected target"""
         #Need to check if anything is selected!
@@ -208,18 +233,11 @@ class frm_main(tk.Tk):
         self.list_hosts_toolbar.show()
         self.inputframe.pack(side=RIGHT, fill=Y)
 
-        # display Logwindow
-        
-        #self.logg.show()
-
-
-
     def addtext(self, *args):
             self.logg.println("test", "text2", "text3")
             self.logg.println("test", "text2", "text3", prefix="switch1")
 
     def _viewmenu_show_window_pane(self, *args):
-        print(self.viewlogg)
         self.viewlogg = not self.viewlogg
         if self.viewlogg:
             self.logg.show()
