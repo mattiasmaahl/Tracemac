@@ -35,6 +35,10 @@ class frm_main(tk.Tk):
     settings_file = "settings.ini"
     viewlogg = False
     gfxpath = "gfx/"
+    _data_list = dict()
+    _data_list['targets'] = list()
+    _data_list['hosts'] = list()
+    listwidget = dict()
     
     def __init__(self, settingspath="conf/", gfxpath="gfx/"):
         tk.Tk.__init__(self)
@@ -49,7 +53,7 @@ class frm_main(tk.Tk):
         self.bind_all("<Control-x>", self.quit)
         self.bind_all("<Control-t>", lambda x:self.list_add(widget=self.list_targets))
         self.bind_all("<Control-h>", lambda x:self.list_add(widget=self.list_hosts))
-        self.list_targets.insert(END, "1.1.1.1")
+        #self.list_targets.insert(END, "1.1.1.1")
         
         #checks if the settings_file exists, if not it creates it with defaults.
         if os.path.isfile(self.settings_file):
@@ -72,10 +76,23 @@ class frm_main(tk.Tk):
         datacol = Collectdata(self, title="Enter IP-addres", gfxpath=self.gfxpath)
         valid, ip, ip2, mask = datacol.show()
         lst = widget.get(0, END)
+        dname = self.listwidget[widget.winfo_name]
         if valid:
             if ip and ip2:
                 #It's a range
-                print("IT's a range!! %s-%s" %(ip, ip2))
+                v=dict()
+                item = ip + "-" + ip2
+                if item in lst:
+                    messagebox.showinfo("message", "IP-Range %s is allready in the list of targets!" % item)
+                else:
+                    v = { item: {
+                    'ip': ip,
+                    'ip2': ip2,
+                    'mask': mask,
+                    'type': 'range'
+                    }}
+                    self._data_list[dname].append(v)
+                    widget.insert(END, item)
             elif ip and mask and not ip2:
                 #It's a network with a mask
                 #Need to deside how to add these to the list?!?!
@@ -87,7 +104,6 @@ class frm_main(tk.Tk):
                 #It's a single IP-address ( same as /32 mask )
                 print("It's a single ip-adress:", ip)
                 if ip in lst:
-                    print(lst)
                     messagebox.showinfo("message", "Ip %s is allready in the list of targets!" % ip)
                 else:
                     widget.insert(END, ip)
@@ -211,6 +227,7 @@ class frm_main(tk.Tk):
         Label(self.inputframe, text="Targets to look for:", pady=2).pack()
         self.list_targets = Listbox(self.inputframe, selectmode=BROWSE)
         self.list_targets.pack(side=TOP, pady=5)
+        self.listwidgets[self.list_targets.winfo_name] = 'targets'
         self.list_targets_toolbar = Toolbar(parent=self.inputframe)
         self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png",
                                       tooltip="Add new target", command=lambda: self.list_add(widget=self.list_targets))
@@ -223,6 +240,7 @@ class frm_main(tk.Tk):
         Label(self.inputframe, text="Hosts to scan:", pady=2).pack()
         self.list_hosts = Listbox(self.inputframe, selectmode=BROWSE)
         self.list_hosts.pack(side=TOP, pady=5)
+        self.listwidgets[self.list_hosts.winfo_name] = 'hosts'
         self.list_hosts_toolbar = Toolbar(parent=self.inputframe)
         self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png",
                                     tooltip="Add new host", command=lambda: self.list_add(self.list_hosts))
