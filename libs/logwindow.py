@@ -9,6 +9,13 @@ from tkinter import *
 
 
 class Logwindow(object):
+    """
+    Logwidget for the main application.
+    use:
+        lg = Lowindow(parent=root)
+        lg.show() - to show the window
+        lg.hide() - to hide the window
+    """
     height=60
     bd=1
     relief=SUNKEN
@@ -29,6 +36,11 @@ class Logwindow(object):
         self.label.pack(fill=BOTH)
 
     def println(self, *text, prefix=None):
+        """
+        prints text in the widget.
+        input is an arbitrary number of strings.
+        keyword argument 'prefix' is set if user wants a prefix on each line.
+        """
         before=""
         if prefix:
             before = ":: %s :: " % prefix
@@ -40,12 +52,17 @@ class Logwindow(object):
                 self.label.see('end')
 
     def clear(self, *args):
+        """
+        clears the widget from all text.
+        """
         self.label.configure(state=NORMAL)
         self.label.delete(1.0, END)
         self.label.configure(state=DISABLED)
 
     def show(self):
+        """ shows the widget"""
         self.frame.pack(side=BOTTOM, fill=X)
 
     def hide(self):
+        """ hides the widget"""
         self.frame.pack_forget()
