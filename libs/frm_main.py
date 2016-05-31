@@ -76,7 +76,7 @@ class frm_main(tk.Tk):
         datacol = Collectdata(self, title="Enter IP-addres", gfxpath=self.gfxpath)
         valid, ip, ip2, mask = datacol.show()
         lst = widget.get(0, END)
-        dname = listwidget[widget.winfo_name]
+        dname = self.listwidget[widget.winfo_name]
         if valid:
             if ip and ip2:
                 #It's a range
@@ -227,6 +227,7 @@ class frm_main(tk.Tk):
         Label(self.inputframe, text="Targets to look for:", pady=2).pack()
         self.list_targets = Listbox(self.inputframe, selectmode=BROWSE)
         self.list_targets.pack(side=TOP, pady=5)
+        self.listwidgets[self.list_targets.winfo_name] = 'targets'
         self.list_targets_toolbar = Toolbar(parent=self.inputframe)
         self.list_targets_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addtarget.png",
                                       tooltip="Add new target", command=lambda: self.list_add(widget=self.list_targets))
@@ -239,6 +240,7 @@ class frm_main(tk.Tk):
         Label(self.inputframe, text="Hosts to scan:", pady=2).pack()
         self.list_hosts = Listbox(self.inputframe, selectmode=BROWSE)
         self.list_hosts.pack(side=TOP, pady=5)
+        self.listwidgets[self.list_hosts.winfo_name] = 'hosts'
         self.list_hosts_toolbar = Toolbar(parent=self.inputframe)
         self.list_hosts_toolbar.add(wtype="button", gfxpath=self.gfxpath + "addhost.png",
                                     tooltip="Add new host", command=lambda: self.list_add(self.list_hosts))
